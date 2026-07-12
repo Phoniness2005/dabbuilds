@@ -465,6 +465,31 @@ body.blog .post:hover {
   color: var(--dab-cyan);
 }
 
+.dab-post-thumb {
+  display: block;
+  margin: 0.85rem 0 1rem;
+}
+
+.dab-post-thumb img {
+  width: 100%;
+  border-radius: var(--dab-radius-sm);
+  border: 1px solid var(--dab-line);
+}
+
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 2rem;
+  font-family: var(--dab-font-display);
+  font-weight: 600;
+}
+
+.pagination a {
+  color: var(--dab-cyan);
+  text-decoration: none;
+}
+
 /* Single post */
 body.single .site-main,
 body.page .site-main {

@@ -20,6 +20,7 @@ function dabbuilds_child_enqueue_assets() {
 		null
 	);
 
+	// Parent structural CSS (Hello Elementor 3.x uses assets/, not only style.css).
 	wp_enqueue_style(
 		'hello-elementor',
 		get_template_directory_uri() . '/style.css',
@@ -30,7 +31,7 @@ function dabbuilds_child_enqueue_assets() {
 	wp_enqueue_style(
 		'dabbuilds-child',
 		get_stylesheet_uri(),
-		array( 'hello-elementor', 'dabbuilds-fonts' ),
+		array( 'dabbuilds-fonts' ),
 		wp_get_theme()->get( 'Version' )
 	);
 
@@ -59,6 +60,10 @@ add_action( 'wp_enqueue_scripts', 'dabbuilds_child_enqueue_assets', 20 );
 
 /**
  * Preconnect to Google Fonts.
+ *
+ * @param array  $urls          URLs to print for resource hints.
+ * @param string $relation_type The relation type the URLs are printed for.
+ * @return array
  */
 function dabbuilds_child_resource_hints( $urls, $relation_type ) {
 	if ( 'preconnect' === $relation_type ) {
@@ -82,7 +87,7 @@ function dabbuilds_child_is_blog_index() {
 }
 
 /**
- * Home hero markup.
+ * Home hero markup (safe to call once per request).
  */
 function dabbuilds_child_render_hero() {
 	static $printed = false;
@@ -91,7 +96,7 @@ function dabbuilds_child_render_hero() {
 	}
 	$printed = true;
 	?>
-	<section class="dab-hero" aria-label="Introduction">
+	<section class="dab-hero" aria-label="<?php echo esc_attr__( 'Introduction', 'dabbuilds-child' ); ?>">
 		<div class="dab-hero__grid" aria-hidden="true"></div>
 		<div class="dab-hero__glow" aria-hidden="true"></div>
 		<div class="dab-hero__inner">
@@ -109,7 +114,7 @@ function dabbuilds_child_render_hero() {
 				<a class="dab-btn dab-btn--primary" href="#dab-latest">Read the build log</a>
 				<a class="dab-btn dab-btn--ghost" href="<?php echo esc_url( home_url( '/dabs-resume/' ) ); ?>">Resume</a>
 			</div>
-			<ul class="dab-hero__signals" aria-label="Focus areas">
+			<ul class="dab-hero__signals" aria-label="<?php echo esc_attr__( 'Focus areas', 'dabbuilds-child' ); ?>">
 				<li>FPV &amp; flight systems</li>
 				<li>AI-assisted building</li>
 				<li>Open experiments</li>
@@ -121,24 +126,15 @@ function dabbuilds_child_render_hero() {
 }
 
 /**
- * Print hero once at the start of the main loop on the blog index.
+ * Hide default Hello archive title on the blog home (hero replaces it).
+ *
+ * @param bool $show Whether to show the page title.
+ * @return bool
  */
-function dabbuilds_child_loop_start_hero() {
-	if ( ! dabbuilds_child_is_blog_index() ) {
-		return;
+function dabbuilds_child_hide_home_archive_title( $show ) {
+	if ( dabbuilds_child_is_blog_index() ) {
+		return false;
 	}
-	// Only for the main query.
-	if ( ! in_the_loop() && ! did_action( 'loop_start' ) ) {
-		// still allow first loop_start
-	}
-	dabbuilds_child_render_hero();
+	return $show;
 }
-add_action( 'loop_start', 'dabbuilds_child_loop_start_hero', 1 );
-
-/**
- * Fallback if loop_start never fires (some Elementor canvas templates).
- */
-function dabbuilds_child_wp_body_open_flag() {
-	// no-op placeholder for future canvas support
-}
-add_action( 'wp_body_open', 'dabbuilds_child_wp_body_open_flag' );
+add_filter( 'hello_elementor_page_title', 'dabbuilds_child_hide_home_archive_title' );

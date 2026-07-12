@@ -35,23 +35,20 @@ Every meaningful site change that *can* live in code should:
 
 **Rule of thumb:** if an agent should redo or improve it later, put it in git.
 
-## Deploy options (pick what your plan supports)
+## Deploy (Elementor Cloud SFTP — primary)
 
-### A. SFTP upload (common)
+See **[deploy.md](./deploy.md)** for the full approve → upload flow.
 
-Upload files from `custom/theme` or `custom/plugins` to the matching path under WordPress (`wp-content/themes/...`, `wp-content/plugins/...`).
+```bash
+./scripts/deploy-sftp.sh --dry-run   # preview
+./scripts/deploy-sftp.sh --yes       # live upload (only after you approve)
+```
 
-### B. WP Admin upload
+### Other options
 
-Zip a plugin or theme from this repo → Plugins / Themes → Upload.
-
-### C. Custom CSS in Elementor / Customizer
-
-Paste or sync contents of `custom/css/*.css` into the site’s Additional CSS / Elementor custom CSS, and keep the file here as source of truth.
-
-### D. Full local WordPress (later, advanced)
-
-Local Docker/LocalWP copy of the site for heavy development, then selective deploy. Document here when set up.
+- **WP Admin upload:** zip a plugin/theme → Plugins / Themes → Upload  
+- **Elementor UI:** layout/content still edited in Elementor; export templates to `elementor/templates/` when you want them in git  
+- **Local WordPress (later):** LocalWP/Docker for offline testing — see `hosting-options.md`
 
 ## Branching
 

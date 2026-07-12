@@ -50,8 +50,17 @@ This repo is the source of truth for:
 4. Review the diff in Cursor, commit, open a PR if desired
 5. Deploy approved changes to Elementor Cloud (see `docs/workflow.md`)
 
+## Deploy (after you approve)
+
+```bash
+./scripts/deploy-sftp.sh --dry-run
+./scripts/deploy-sftp.sh --yes
+```
+
+SFTP credentials: `.env.local` only (gitignored). Details: [`docs/deploy.md`](docs/deploy.md).
+
 ## Status
 
 **Phase 1 — established:** repo, docs, folders for custom code.  
-**Phase 2 — connect:** export/connect SFTP or theme files from Elementor Cloud when available.  
-**Phase 3 — iterate:** implement tracked changes with agent assistance.
+**Phase 2 — connected:** SFTP to Elementor Cloud (`/html`), child theme scaffold, deploy scripts.  
+**Phase 3 — iterate:** implement tracked changes with agent assistance; activate child theme after first deploy.

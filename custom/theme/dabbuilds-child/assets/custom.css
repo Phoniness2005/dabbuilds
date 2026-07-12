@@ -1,0 +1,10 @@
+/**
+ * Site-wide custom CSS for dabbuilds.com
+ * Edit here → review in git → deploy with: ./scripts/deploy-sftp.sh --yes
+ */
+
+/* Example (disabled): slightly larger base type
+body {
+  font-size: 1.05rem;
+}
+*/

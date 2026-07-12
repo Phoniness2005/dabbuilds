@@ -33,7 +33,9 @@
 
 - Ask before destructive ops (delete pages, reset theme, mass rewrite content).
 - Prefer small, reviewable commits with clear messages.
-- If deploy path to Elementor Cloud is unknown, implement + document; do not assume SFTP/Git deploy exists.
+- **Never deploy to live without explicit user approval.** Deploy command: `./scripts/deploy-sftp.sh --yes` (requires `--yes`; credentials only in `.env.local`).
+- Never commit `.env.local`, passwords, or Application Passwords.
+- Do not overwrite remote Elementor/Hello core plugins/themes with bulk sync; only push `custom/theme/dabbuilds-child` and `custom/plugins/*`.
 
 ## When starting a task
 

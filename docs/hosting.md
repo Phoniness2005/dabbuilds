@@ -24,15 +24,35 @@ When logged into the site subscription, note whether these exist:
 
 Fill in below when you have them (do **not** put real passwords in git — only hostnames/usernames if non-sensitive, or keep credentials in a password manager).
 
-### SFTP (fill later)
+### SFTP (configured locally)
+
+Credentials live in **`.env.local` only** (never git). Confirmed working:
 
 ```text
-Host:
-Port:
-Username:
-Password: (password manager only)
-Remote path:
+Host: sftp.elementor.cloud
+Port: 32022
+Remote WordPress root: /html
+Active theme family: Hello Elementor (+ child: dabbuilds-child)
 ```
+
+Remote layout (partial):
+
+```text
+/html/
+  wp-content/
+    themes/
+      hello-elementor/
+      twentyseventeen/
+      dabbuilds-child/    # created on first deploy
+    plugins/
+      elementor/
+      envato-elements/
+      image-optimization/
+      redis-cache/
+      aryo-activity-log/
+```
+
+Deploy: `./scripts/deploy-sftp.sh --yes` (see `docs/deploy.md`).
 
 ### WordPress Application Password (for REST API; optional)
 

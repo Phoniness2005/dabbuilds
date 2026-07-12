@@ -1,0 +1,55 @@
+#!/usr/bin/env expect -f
+# Usage: sftp-cmd.exp <host> <port> <user> <password> <command1> [command2 ...]
+# Runs one or more sftp batch commands after login.
+
+if {$argc < 5} {
+  puts stderr "Usage: sftp-cmd.exp host port user password cmd \[cmd...\]"
+  exit 2
+}
+
+set host [lindex $argv 0]
+set port [lindex $argv 1]
+set user [lindex $argv 2]
+set password [lindex $argv 3]
+set cmds [lrange $argv 4 end]
+
+set timeout 120
+log_user 1
+
+spawn sftp -oStrictHostKeyChecking=accept-new -oPreferredAuthentications=password -oPubkeyAuthentication=no -P $port ${user}@${host}
+
+expect {
+  -re {[Pp]assword:} {
+    send -- "$password\r"
+  }
+  timeout {
+    puts stderr "TIMEOUT waiting for password prompt"
+    exit 1
+  }
+}
+
+expect {
+  -re {sftp>} {}
+  -re {[Pp]ermission denied} {
+    puts stderr "AUTH FAILED"
+    exit 1
+  }
+  timeout {
+    puts stderr "TIMEOUT after auth"
+    exit 1
+  }
+}
+
+foreach cmd $cmds {
+  send -- "$cmd\r"
+  expect {
+    -re {sftp>} {}
+    timeout {
+      puts stderr "TIMEOUT running: $cmd"
+      exit 1
+    }
+  }
+}
+
+send "bye\r"
+expect eof

@@ -385,15 +385,16 @@ body.dab-scrolled .site-header {
   padding-bottom: 4rem;
 }
 
-/* Home: pull hero full-bleed outside constrained main if nested */
-body.home .site-main > .dab-hero,
-body.blog .site-main > .dab-hero {
+/* Full-bleed hero whether nested under main or page-content */
+body.home .dab-hero,
+body.blog .dab-hero {
   width: 100vw;
   max-width: 100vw;
   margin-left: calc(50% - 50vw);
   margin-right: calc(50% - 50vw);
   padding-left: clamp(1.25rem, 4vw, 2.5rem);
   padding-right: clamp(1.25rem, 4vw, 2.5rem);
+  box-sizing: border-box;
 }
 
 /* Section label above posts */

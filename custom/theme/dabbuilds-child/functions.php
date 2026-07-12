@@ -138,3 +138,29 @@ function dabbuilds_child_hide_home_archive_title( $show ) {
 	return $show;
 }
 add_filter( 'hello_elementor_page_title', 'dabbuilds_child_hide_home_archive_title' );
+
+/**
+ * Force child index.php on the blog home so Elementor Theme Builder
+ * cannot swallow the hero (template_include override).
+ *
+ * @param string $template Path to template.
+ * @return string
+ */
+function dabbuilds_child_force_blog_template( $template ) {
+	if ( dabbuilds_child_is_blog_index() ) {
+		$custom = get_stylesheet_directory() . '/index.php';
+		if ( file_exists( $custom ) ) {
+			return $custom;
+		}
+	}
+	return $template;
+}
+add_filter( 'template_include', 'dabbuilds_child_force_blog_template', 99 );
+
+/**
+ * Extra Elementor hooks — print hero if archive location still runs.
+ */
+function dabbuilds_child_elementor_archive_hero() {
+	dabbuilds_child_render_hero();
+}
+add_action( 'elementor/theme/before_do_archive', 'dabbuilds_child_elementor_archive_hero' );

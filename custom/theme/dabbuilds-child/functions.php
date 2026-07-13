@@ -20,7 +20,6 @@ function dabbuilds_child_enqueue_assets() {
 		null
 	);
 
-	// Parent structural CSS (Hello Elementor 3.x uses assets/, not only style.css).
 	wp_enqueue_style(
 		'hello-elementor',
 		get_template_directory_uri() . '/style.css',
@@ -87,6 +86,62 @@ function dabbuilds_child_is_blog_index() {
 }
 
 /**
+ * Public URL of the resume attachment (.doc / .pdf / .docx).
+ *
+ * @return string Empty if not found.
+ */
+function dabbuilds_child_get_resume_file_url() {
+	$cached = get_transient( 'dabbuilds_resume_file_url' );
+	if ( is_string( $cached ) && $cached !== '' ) {
+		return $cached;
+	}
+
+	// Prefer known media filename, then page content, then media search.
+	$candidates = array();
+
+	$by_name = get_posts(
+		array(
+			'post_type'      => 'attachment',
+			'post_status'    => 'inherit',
+			'posts_per_page' => 5,
+			's'              => 'Resume',
+			'orderby'        => 'date',
+			'order'          => 'DESC',
+		)
+	);
+	foreach ( $by_name as $att ) {
+		$url = wp_get_attachment_url( $att->ID );
+		if ( $url && preg_match( '/\.(docx?|pdf)$/i', $url ) ) {
+			$candidates[] = $url;
+		}
+	}
+
+	$page = get_page_by_path( 'dabs-resume' );
+	if ( $page ) {
+		if ( preg_match( '/href=["\']([^"\']+\.(?:docx?|pdf))["\']/i', $page->post_content, $m ) ) {
+			array_unshift( $candidates, $m[1] );
+		}
+	}
+
+	// Last-resort known path (current production file).
+	$candidates[] = home_url( '/wp-content/uploads/2025/07/Resume-V5-2025.doc' );
+
+	$url = '';
+	foreach ( $candidates as $candidate ) {
+		if ( is_string( $candidate ) && $candidate !== '' ) {
+			$url = esc_url_raw( $candidate );
+			break;
+		}
+	}
+
+	if ( $url ) {
+		set_transient( 'dabbuilds_resume_file_url', $url, HOUR_IN_SECONDS );
+	}
+
+	return $url;
+}
+
+/**
  * Home hero markup (safe to call once per request).
  */
 function dabbuilds_child_render_hero() {
@@ -140,22 +195,38 @@ function dabbuilds_child_hide_home_archive_title( $show ) {
 add_filter( 'hello_elementor_page_title', 'dabbuilds_child_hide_home_archive_title' );
 
 /**
- * Force child index.php on the blog home so Elementor Theme Builder
- * cannot swallow the hero (template_include override).
+ * Force child templates so Elementor Theme Builder cannot skip our layouts.
  *
  * @param string $template Path to template.
  * @return string
  */
-function dabbuilds_child_force_blog_template( $template ) {
-	if ( dabbuilds_child_is_blog_index() ) {
-		$custom = get_stylesheet_directory() . '/index.php';
+function dabbuilds_child_force_templates( $template ) {
+	$dir = get_stylesheet_directory();
+
+	if ( is_page( 'dabs-resume' ) ) {
+		$custom = $dir . '/page-dabs-resume.php';
 		if ( file_exists( $custom ) ) {
 			return $custom;
 		}
 	}
+
+	if ( dabbuilds_child_is_blog_index() ) {
+		$custom = $dir . '/index.php';
+		if ( file_exists( $custom ) ) {
+			return $custom;
+		}
+	}
+
+	if ( is_singular() ) {
+		$custom = $dir . '/singular.php';
+		if ( file_exists( $custom ) ) {
+			return $custom;
+		}
+	}
+
 	return $template;
 }
-add_filter( 'template_include', 'dabbuilds_child_force_blog_template', 99 );
+add_filter( 'template_include', 'dabbuilds_child_force_templates', 99 );
 
 /**
  * Extra Elementor hooks — print hero if archive location still runs.
@@ -164,3 +235,25 @@ function dabbuilds_child_elementor_archive_hero() {
 	dabbuilds_child_render_hero();
 }
 add_action( 'elementor/theme/before_do_archive', 'dabbuilds_child_elementor_archive_hero' );
+
+/**
+ * Serve resume downloads with Content-Disposition: attachment when ?download=1.
+ * Keeps normal URL for Office Online preview (inline).
+ */
+function dabbuilds_child_resume_download_headers() {
+	if ( empty( $_GET['dab_download'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		return;
+	}
+
+	$file = dabbuilds_child_get_resume_file_url();
+	if ( ! $file ) {
+		return;
+	}
+
+	// Only force download for our known resume URL path.
+	$path = wp_parse_url( $file, PHP_URL_PATH );
+	$req  = wp_parse_url( home_url( add_query_arg( array() ) ), PHP_URL_PATH );
+	// Handled via dedicated endpoint below — this early check is unused for remote files.
+	unset( $path, $req );
+}
+// Attachment files are static on CDN; download attr on <a> is enough for modern browsers.

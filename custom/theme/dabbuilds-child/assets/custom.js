@@ -1,5 +1,5 @@
 /**
- * Light UI polish for dabbuilds.com
+ * UI polish: scroll state, post cards, mobile nav.
  */
 (function () {
   'use strict';
@@ -48,5 +48,42 @@
     cards.forEach(function (card) {
       io.observe(card);
     });
+  }
+
+  // Mobile nav
+  var toggle = document.querySelector('.dab-nav-toggle');
+  var nav = document.getElementById('dab-primary-nav');
+  if (toggle && nav) {
+    function setOpen(open) {
+      root.classList.toggle('dab-nav-open', open);
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      toggle.setAttribute(
+        'aria-label',
+        open ? 'Close menu' : 'Open menu'
+      );
+    }
+
+    toggle.addEventListener('click', function () {
+      setOpen(!root.classList.contains('dab-nav-open'));
+    });
+
+    nav.querySelectorAll('a').forEach(function (link) {
+      link.addEventListener('click', function () {
+        setOpen(false);
+      });
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') setOpen(false);
+    });
+
+    // Close on resize to desktop
+    window.addEventListener(
+      'resize',
+      function () {
+        if (window.innerWidth > 768) setOpen(false);
+      },
+      { passive: true }
+    );
   }
 })();

@@ -2,60 +2,84 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
   <title>Wimbledon Pong</title>
   <style>
-    body {
+    html, body {
       margin: 0;
+      height: 100%;
+      height: 100dvh;
+      overflow: hidden;
+      overscroll-behavior: none;
+    }
+    body {
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
       background-color: #1b3c1f; /* Wimbledon dark green */
-      overflow: hidden;
       font-family: 'Courier New', monospace;
+      padding: max(4px, env(safe-area-inset-top)) max(4px, env(safe-area-inset-right)) max(4px, env(safe-area-inset-bottom)) max(4px, env(safe-area-inset-left));
+    }
+    .stage {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      line-height: 0;
     }
     canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
       border: 8px solid #4b286d; /* Thicker Wimbledon purple border */
       box-shadow: 0 0 0 4px #ffffff; /* White outer border for contrast */
       background-color: #2e7d32; /* Grass court green */
       image-rendering: pixelated; /* For retro SNES look */
+      touch-action: none;
     }
     #score {
       position: absolute;
-      top: 20px;
+      top: 3%;
+      left: 0;
       width: 100%;
       text-align: center;
-      font-size: 48px;
+      font-size: clamp(22px, 5vw, 48px);
       color: #ffffff;
       text-shadow: 3px 3px #4b286d;
+      pointer-events: none;
+      line-height: 1.2;
     }
     #stats {
       position: absolute;
-      top: 80px;
+      top: 11%;
+      left: 0;
       width: 100%;
       text-align: center;
-      font-size: 32px;
+      font-size: clamp(14px, 3.2vw, 32px);
       color: #ffffff;
       text-shadow: 2px 2px #4b286d;
+      pointer-events: none;
+      line-height: 1.2;
     }
+    #ui:empty { pointer-events: none; }
     #ui {
       position: absolute;
-      width: 100%;
-      height: 100%;
+      inset: 0;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
       color: #ffffff;
       text-shadow: 2px 2px #4b286d;
-      font-size: 36px;
+      font-size: clamp(18px, 4vw, 36px);
       text-align: center;
+      line-height: 1.3;
     }
     #ui div {
       margin: 10px;
-      padding: 10px;
+      padding: 12px 16px;
       cursor: pointer;
+      min-height: 44px;
     }
     #ui .selected {
       background-color: #4b286d;
@@ -63,17 +87,23 @@
     }
     #ui .instructions {
       position: absolute;
-      bottom: 20px;
-      font-size: 24px;
+      left: 8px;
+      right: 8px;
+      bottom: 4%;
+      width: auto;
+      font-size: clamp(12px, 2.6vw, 24px);
       color: #c6ff00;
+      white-space: normal;
     }
   </style>
 </head>
 <body>
-  <div id="score">0 - 0</div>
-  <div id="stats">Game 1 | P1 Wins: 0 | P2 Wins: 0</div>
-  <div id="ui"></div>
-  <canvas id="gameCanvas" width="1200" height="900"></canvas>
+  <div class="stage">
+    <div id="score">0 - 0</div>
+    <div id="stats">Game 1 | P1 Wins: 0 | P2 Wins: 0</div>
+    <div id="ui"></div>
+    <canvas id="gameCanvas" width="1200" height="900"></canvas>
+  </div>
   <script>
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
@@ -166,6 +196,7 @@
     };
 
     document.addEventListener('keydown', (e) => {
+      if (['ArrowUp', 'ArrowDown', ' '].includes(e.key)) e.preventDefault();
       if (e.key in keys) keys[e.key] = true;
     });
 
@@ -475,27 +506,27 @@
         }
       } else if (gameState === states.MENU) {
         ui.innerHTML = `
-          <div class="${selectedOption === 0 ? 'selected' : ''}">One Player</div>
-          <div class="${selectedOption === 1 ? 'selected' : ''}">Two Players</div>
+          <div data-choice="0" class="${selectedOption === 0 ? 'selected' : ''}">One Player</div>
+          <div data-choice="1" class="${selectedOption === 1 ? 'selected' : ''}">Two Players</div>
           <div class="instructions">
-            Player 1: W (Up), S (Down), P (Pause)${selectedOption === 1 ? '<br>Player 2: Arrow Up, Arrow Down' : ''}
+            Tap a choice, or use arrows and Enter. Drag the court to move. Player 1: W / S, P pause${selectedOption === 1 ? '<br>Player 2: Arrow Up, Arrow Down' : ''}
           </div>
         `;
         statsDisplay.textContent = `Game ${gameNumber} | P1 Wins: ${player1Wins} | P2 Wins: ${player2Wins}`;
       } else if (gameState === states.DIFFICULTY) {
         ui.innerHTML = `
-          <div class="${selectedOption === 0 ? 'selected' : ''}">Amateur</div>
-          <div class="${selectedOption === 1 ? 'selected' : ''}">Tour</div>
-          <div class="${selectedOption === 2 ? 'selected' : ''}">Pro</div>
+          <div data-choice="0" class="${selectedOption === 0 ? 'selected' : ''}">Amateur</div>
+          <div data-choice="1" class="${selectedOption === 1 ? 'selected' : ''}">Tour</div>
+          <div data-choice="2" class="${selectedOption === 2 ? 'selected' : ''}">Pro</div>
           <div class="instructions">
-            Player 1: W (Up), S (Down), P (Pause)
+            Tap a skill. Player 1: W / S or drag, P pause
           </div>
         `;
       } else if (gameState === states.REMATCH) {
         ui.innerHTML = `
           <div>Do you want another match?</div>
-          <div class="${selectedOption === 0 ? 'selected' : ''}">Yes</div>
-          <div class="${selectedOption === 1 ? 'selected' : ''}">No</div>
+          <div data-choice="0" class="${selectedOption === 0 ? 'selected' : ''}">Yes</div>
+          <div data-choice="1" class="${selectedOption === 1 ? 'selected' : ''}">No</div>
         `;
         scoreDisplay.textContent = `${paddle1.score} - ${paddle2.score}`;
       } else if (gameState === states.POST_WIN) {
@@ -517,6 +548,48 @@
       draw();
       requestAnimationFrame(gameLoop);
     }
+
+    function canvasPointerY(clientY) {
+      const rect = canvas.getBoundingClientRect();
+      return ((clientY - rect.top) / rect.height) * canvas.height;
+    }
+    function movePaddleFromPointer(clientY, paddle) {
+      paddle.y = canvasPointerY(clientY) - paddle.height / 2;
+      if (paddle.y < 0) paddle.y = 0;
+      if (paddle.y > canvas.height - paddle.height) paddle.y = canvas.height - paddle.height;
+    }
+    canvas.addEventListener('mousemove', (e) => {
+      if (gameState !== states.PLAYING) return;
+      movePaddleFromPointer(e.clientY, paddle1);
+    });
+    canvas.addEventListener('touchstart', (e) => {
+      if (gameState !== states.PLAYING) return;
+      e.preventDefault();
+      const rect = canvas.getBoundingClientRect();
+      for (let i = 0; i < e.touches.length; i++) {
+        const t = e.touches[i];
+        const x = (t.clientX - rect.left) / rect.width;
+        if (gameMode === 'two' && x > 0.5) movePaddleFromPointer(t.clientY, paddle2);
+        else movePaddleFromPointer(t.clientY, paddle1);
+      }
+    }, { passive: false });
+    canvas.addEventListener('touchmove', (e) => {
+      if (gameState !== states.PLAYING) return;
+      e.preventDefault();
+      const rect = canvas.getBoundingClientRect();
+      for (let i = 0; i < e.touches.length; i++) {
+        const t = e.touches[i];
+        const x = (t.clientX - rect.left) / rect.width;
+        if (gameMode === 'two' && x > 0.5) movePaddleFromPointer(t.clientY, paddle2);
+        else movePaddleFromPointer(t.clientY, paddle1);
+      }
+    }, { passive: false });
+    ui.addEventListener('click', (e) => {
+      const choice = e.target.closest('[data-choice]');
+      if (!choice) return;
+      selectedOption = Number(choice.getAttribute('data-choice'));
+      keys.Enter = true;
+    });
 
     // Start game
     resetBall();

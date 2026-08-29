@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Wimbledon Pong — Version 1 and 2</title>
   <style>
-    :root { --purple: #4b286d; --green: #16331a; --white: #f4f7f2; }
+    :root { --purple: #4b286d; --green: #0f2414; --white: #fffef6; --ball: #d4ff3f; }
     * { box-sizing: border-box; }
     body {
       margin: 0;
@@ -14,50 +14,68 @@
       font-family: "Trebuchet MS", "Segoe UI", sans-serif;
       padding: 24px 16px 48px;
     }
-    .page { max-width: 1100px; margin: 0 auto; }
+    .page { max-width: 720px; margin: 0 auto; }
     h1 { margin: 0 0 8px; font-size: clamp(28px, 4vw, 42px); text-shadow: 0 3px 0 #2a1540; }
-    .lede { max-width: 42rem; line-height: 1.5; color: #e6ffb0; }
-    .edition { margin: 36px 0; }
-    .edition h2 { margin: 0 0 6px; font-size: 22px; }
-    .edition p { margin: 0 0 12px; color: #d7c4ee; }
-    .frame {
-      background: #0c1a0e;
-      box-shadow: 0 16px 40px rgba(0,0,0,0.4);
-    }
-    iframe {
+    .lede { max-width: 42rem; line-height: 1.55; color: #f4ffc4; font-size: 18px; }
+    .edition { margin: 28px 0; }
+    .edition h2 { margin: 0 0 6px; font-size: 22px; color: #ffffff; }
+    .edition p { margin: 0 0 14px; color: #f3e8ff; line-height: 1.5; }
+    .play-card {
       display: block;
-      width: 100%;
-      height: min(82vh, 880px);
-      border: 0;
-      background: #16331a;
+      text-decoration: none;
+      color: var(--white);
+      background: var(--purple);
+      border: 3px solid #f4ffc4;
+      padding: 18px 20px;
+      min-height: 48px;
     }
-    a { color: #d4ff3f; }
+    .play-card:hover, .play-card:focus-visible {
+      background: #6a3d96;
+      border-color: var(--ball);
+      outline: none;
+    }
+    .play-card .eyebrow {
+      display: block;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--ball);
+      margin-bottom: 4px;
+    }
+    .play-card strong { display: block; font-size: 22px; margin-bottom: 6px; }
+    .play-card .hint { display: block; color: #f3e8ff; font-size: 15px; line-height: 1.4; }
+    a.plain { color: var(--ball); }
   </style>
 </head>
 <body>
   <div class="page">
     <h1>Wimbledon Pong</h1>
     <p class="lede">
-      Version 2 is the cleaned-up court: menus you can click, an opponent that actually changes
-      with the skill setting, and graphics that sit inside the same lines the ball uses.
-      Version 1 is the original Grok/Replit build, kept underneath so you can see what changed.
+      Pick a version. Each one opens in a new window so you get the whole court —
+      not a cropped box on this page. On a phone, drag the court to move.
     </p>
 
     <section class="edition" id="v2">
       <h2>Version 2 — Centre Court</h2>
-      <p>Click a choice or use the arrow keys and Enter. W and S move your paddle; the mouse works too while the ball is in play.</p>
-      <div class="frame">
-        <iframe src="v2/index.html" title="Wimbledon Pong version 2" allow="autoplay"></iframe>
-      </div>
+      <p>Clickable menus, a fairer computer opponent, and graphics that sit inside the lines.</p>
+      <a class="play-card" href="v2/index.html" target="_blank" rel="noopener">
+        <span class="eyebrow">Play now</span>
+        <strong>Open version 2</strong>
+        <span class="hint">New window. Drag on a phone. W/S or mouse on a computer. Full screen is on the court.</span>
+      </a>
     </section>
 
     <section class="edition" id="v1">
       <h2>Version 1 — Original Grok/Replit build</h2>
-      <p>The first pass, as published in 2025. Keyboard only. Amateur / Tour / Pro were mostly the same bot with different jitter.</p>
-      <div class="frame">
-        <iframe src="v1/index.html" title="Wimbledon Pong version 1" allow="autoplay"></iframe>
-      </div>
+      <p>The first pass, as published in 2025. Kept so you can see what changed.</p>
+      <a class="play-card" href="v1/index.html" target="_blank" rel="noopener">
+        <span class="eyebrow">Play now</span>
+        <strong>Open version 1</strong>
+        <span class="hint">New window. Tap the menus. Drag the court to move.</span>
+      </a>
     </section>
+
+    <p><a class="plain" href="https://github.com/Phoniness2005/grok-replit-open-2025">Source on GitHub</a></p>
   </div>
 </body>
 </html>

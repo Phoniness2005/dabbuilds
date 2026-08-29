@@ -6,9 +6,9 @@ Hosted at `/play/` from the child theme. Source of the game itself is also in [P
 
 | Path | What it is |
 |---|---|
-| `/play/` | Hub. Version 2 on top, version 1 underneath. |
-| `/play/v2/` | August 2026 rebuild. |
-| `/play/v1/` | Original 2025 Grok/Replit build, unchanged. |
+| `/play/` | Hub. Launch cards that open each version in a new window. |
+| `/play/v2/` | August 2026 rebuild. Fills the window. Touch, on-screen Up/Down, full screen. |
+| `/play/v1/` | Original 2025 Grok/Replit build, now scaled to the window with tap menus and drag-to-move. |
 
 `functions.php` serves the HTML without WordPress chrome. Do not place a real `/html/play/` directory on the web root: Elementor/nginx treats it as a static folder, directory URLs 403, and `/play/` never reaches PHP. Version 2 loads textures from the theme URL on dabbuilds.com (`/wp-content/themes/dabbuilds-child/play/v2/assets/`) and from relative `assets/` on GitHub Pages.
 
@@ -26,7 +26,7 @@ The original game was a 1200×900 canvas with CSS `border: 8px purple` and `box-
 
 ## Version 2 (what changed)
 
-**UI.** HTML overlay instead of canvas text. Click or keyboard. No key-repeat on menus. Overlay is rebuilt only when the state changes. HUD is in a grid above the court, so it stays lined up in an iframe. Mouse and touch move the left paddle while the ball is in play; WASD is ignored for a moment after the pointer moves so they do not fight. Pause is `P`. Esc goes to the menu (and back one step on the difficulty screen).
+**UI.** HTML overlay instead of canvas text. Click or keyboard. No key-repeat on menus. Overlay is rebuilt only when the state changes. The court fills the window (16:9 inside the leftover space after the HUD). Mouse and touch move the left paddle while the ball is in play; two-player splits the court (left / right). WASD is ignored for a moment after the pointer moves so they do not fight. On a phone, Up/Down/Pause sit under the court. Full screen is a button. Pause is `P`. Esc goes to the menu (and back one step on the difficulty screen). The original post launches each version in a new window instead of an iframe, because the boxes cropped version 1 and made version 2 too small to play.
 
 **Opponent.** Three distinct AIs:
 

@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
   <title>Wimbledon Pong — Version 2</title>
   <style>
     :root {
@@ -17,22 +18,23 @@
     html, body {
       margin: 0;
       height: 100%;
+      height: 100dvh;
       background: radial-gradient(ellipse at center, #1e4a24 0%, var(--green-bg) 70%);
       font-family: "Trebuchet MS", "Segoe UI", sans-serif;
       color: var(--ink);
+      overflow: hidden;
+      overscroll-behavior: none;
     }
     body {
       display: flex;
       flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100%;
-      padding: 10px;
+      padding: max(6px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right)) max(6px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
     }
     .shell {
-      width: min(1120px, 100%);
-      display: flex;
-      flex-direction: column;
+      width: 100%;
+      height: 100%;
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto auto;
       gap: 6px;
     }
     .hud {
@@ -59,16 +61,25 @@
       opacity: 0.92;
     }
     .court-frame {
-      position: relative;
+      min-height: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       background: #0c1a0e;
       box-shadow: 0 16px 48px rgba(0,0,0,0.5);
       line-height: 0;
     }
+    .court-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
     canvas {
       display: block;
       width: 100%;
-      height: auto;
+      height: 100%;
       background: #16331a;
+      touch-action: none;
     }
     .overlay {
       position: absolute;
@@ -137,11 +148,19 @@
     .help {
       display: flex;
       justify-content: space-between;
+      align-items: center;
       gap: 12px;
       flex-wrap: wrap;
       font-size: 13px;
       padding: 2px 4px 0;
       color: #e6ffb0;
+    }
+    .help #help {
+      flex: 1;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
     }
     kbd {
       display: inline-block;
@@ -150,6 +169,42 @@
       font-family: inherit;
       font-size: 12px;
       background: rgba(0,0,0,0.25);
+    }
+    .help button, .touch-bar button {
+      appearance: none;
+      border: 2px solid #d7c4ee;
+      background: var(--purple);
+      color: var(--white);
+      font: inherit;
+      font-size: 15px;
+      font-weight: 700;
+      min-height: 48px;
+      padding: 8px 12px;
+      cursor: pointer;
+    }
+    .help button:hover, .touch-bar button:hover,
+    .help button:focus-visible, .touch-bar button:focus-visible {
+      border-color: var(--ball);
+      outline: none;
+    }
+    .touch-bar {
+      display: none;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+    }
+    .touch-bar.two-player { grid-template-columns: 1fr 1fr 1fr 1fr; }
+    .touch-bar.show { display: grid; }
+    @media (pointer: coarse), (max-width: 720px) {
+      .touch-bar { display: grid; grid-template-columns: 1fr 1fr; }
+      .touch-bar #btnPause { grid-column: 1 / -1; }
+      .hud .side { font-size: 12px; }
+      .overlay { padding: 8px; overflow: auto; }
+      .overlay p.lead { font-size: 14px; }
+      .overlay h2 { font-size: 22px; }
+      .menu { min-width: 0; width: 100%; }
+      .help { flex-direction: column; align-items: stretch; }
+      .help #help { flex-direction: column; }
+      .help button { width: 100%; }
     }
   </style>
 </head>
@@ -161,11 +216,21 @@
       <div class="side right" id="p2Label">Opponent</div>
       <div class="meta" id="meta">First to 10 · Game 1 · You 0 — Opponent 0</div>
     </div>
-    <div class="court-frame">
-      <canvas id="gameCanvas" width="1600" height="900"></canvas>
-      <div class="overlay" id="overlay"></div>
+    <div class="court-frame" id="courtFrame">
+      <div class="court-inner" id="courtInner">
+        <canvas id="gameCanvas" width="1600" height="900"></canvas>
+        <div class="overlay" id="overlay"></div>
+      </div>
     </div>
-    <div class="help" id="help"></div>
+    <div class="touch-bar" id="touchBar">
+      <button type="button" id="btnUp" aria-label="Move up">Up</button>
+      <button type="button" id="btnDown" aria-label="Move down">Down</button>
+      <button type="button" id="btnPause">Pause</button>
+    </div>
+    <div class="help">
+      <div id="help"></div>
+      <button type="button" id="fullBtn">Full screen</button>
+    </div>
   </div>
   <script>
     const canvas = document.getElementById('gameCanvas');
@@ -247,6 +312,8 @@
     let overlayDirty = true;
     let serveHold = 0;
     let mouseLive = 0;
+    let mouseLive2 = 0;
+    let coarse = window.matchMedia('(pointer: coarse)').matches;
 
     const ball = { x: W / 2, y: H / 2, r: 12, vx: 7, vy: 5, trail: [] };
     const p1 = { x: PLAY_LEFT + 28, y: H / 2 - 78, w: 22, h: 156, speed: 9.4, vy: 0, score: 0 };
@@ -331,15 +398,19 @@
       p2Label.textContent = mode === 'two' ? 'Player 2 — ↑ ↓' : (DIFF[difficulty].label + ' opponent');
       if (state === STATES.PLAYING) {
         helpEl.innerHTML = mode === 'two'
-          ? '<span>Player 1: <kbd>W</kbd>/<kbd>S</kbd> or mouse · Player 2: <kbd>↑</kbd> <kbd>↓</kbd></span><span><kbd>P</kbd> pause · <kbd>Esc</kbd> menu</span>'
-          : '<span>Move with <kbd>W</kbd> and <kbd>S</kbd>, or the mouse over the court.</span><span><kbd>P</kbd> pause · <kbd>Esc</kbd> menu</span>';
+          ? '<span>Left half of the court: player 1. Right half: player 2. Or use keys.</span><span><kbd>P</kbd> pause · <kbd>Esc</kbd> menu</span>'
+          : '<span>Drag on the court, use Up/Down, or <kbd>W</kbd> <kbd>S</kbd>.</span><span><kbd>P</kbd> pause · <kbd>Esc</kbd> menu</span>';
       } else if (state === STATES.PAUSED) {
         helpEl.innerHTML = '<span>Paused. Score stays put.</span><span><kbd>P</kbd> resume · <kbd>Esc</kbd> menu</span>';
       } else if (state === STATES.DIFFICULTY) {
-        helpEl.innerHTML = '<span>Click a skill, or use <kbd>↑</kbd> <kbd>↓</kbd> and <kbd>Enter</kbd>.</span><span><kbd>Esc</kbd> goes back.</span>';
+        helpEl.innerHTML = '<span>Tap a skill, or use <kbd>↑</kbd> <kbd>↓</kbd> and <kbd>Enter</kbd>.</span><span><kbd>Esc</kbd> goes back.</span>';
       } else {
-        helpEl.innerHTML = '<span>Click a choice, or use <kbd>↑</kbd> <kbd>↓</kbd> and <kbd>Enter</kbd>.</span><span>The yellow ball is yours to keep in play.</span>';
+        helpEl.innerHTML = '<span>Tap a choice, or use <kbd>↑</kbd> <kbd>↓</kbd> and <kbd>Enter</kbd>.</span><span>The yellow ball is yours to keep in play.</span>';
       }
+      const bar = document.getElementById('touchBar');
+      bar.classList.toggle('show', coarse || window.matchMedia('(pointer: coarse)').matches || window.innerWidth < 720);
+      bar.classList.toggle('two-player', mode === 'two' && state === STATES.PLAYING);
+      document.getElementById('btnPause').textContent = state === STATES.PAUSED ? 'Resume' : 'Pause';
     }
 
     function predictIntercept() {
@@ -434,7 +505,7 @@
       if (state === STATES.MENU) {
         overlay.innerHTML = `
           <h2>Wimbledon Pong</h2>
-          <p class="lead">Centre Court colours. First to ${MAX_SCORE} takes the game. Click a button, or use the arrows and Enter.</p>
+          <p class="lead">Centre Court colours. First to ${MAX_SCORE} takes the game. Tap a button. On a phone, drag the court to move.</p>
           <div class="menu" role="listbox" aria-label="Game mode">
             <button type="button" data-action="one" aria-selected="${selected===0}">One player<span class="hint">You on the left. Computer on the right. Mouse or W/S.</span></button>
             <button type="button" data-action="two" aria-selected="${selected===1}">Two players<span class="hint">Same keyboard. Left: W/S. Right: arrow keys.</span></button>
@@ -573,23 +644,97 @@
     });
     window.addEventListener('keyup', (e) => { keys[e.key] = false; });
 
-    function pointerToPaddle(clientY) {
+    function pointerToPaddle(paddle, clientY, flag) {
       const rect = canvas.getBoundingClientRect();
       const y = ((clientY - rect.top) / rect.height) * H;
-      p1.y = y - p1.h / 2;
-      paddleBounds(p1);
-      mouseLive = 24;
+      paddle.y = y - paddle.h / 2;
+      paddleBounds(paddle);
+      if (flag === 2) mouseLive2 = 24;
+      else mouseLive = 24;
+    }
+
+    function applyPointer(clientX, clientY) {
+      if (state !== STATES.PLAYING) return;
+      const rect = canvas.getBoundingClientRect();
+      const x = ((clientX - rect.left) / rect.width) * W;
+      if (mode === 'two' && x > W / 2) pointerToPaddle(p2, clientY, 2);
+      else pointerToPaddle(p1, clientY, 1);
     }
 
     canvas.addEventListener('mousemove', (e) => {
-      if (state !== STATES.PLAYING) return;
-      pointerToPaddle(e.clientY);
+      applyPointer(e.clientX, e.clientY);
     });
+    canvas.addEventListener('touchstart', (e) => {
+      coarse = true;
+      document.getElementById('touchBar').classList.add('show');
+      if (state !== STATES.PLAYING) return;
+      e.preventDefault();
+      for (let i = 0; i < e.touches.length; i++) applyPointer(e.touches[i].clientX, e.touches[i].clientY);
+    }, { passive: false });
     canvas.addEventListener('touchmove', (e) => {
       if (state !== STATES.PLAYING) return;
       e.preventDefault();
-      pointerToPaddle(e.touches[0].clientY);
+      for (let i = 0; i < e.touches.length; i++) applyPointer(e.touches[i].clientX, e.touches[i].clientY);
     }, { passive: false });
+
+    function holdKey(key, el) {
+      const down = (e) => { e.preventDefault(); keys[key] = true; coarse = true; };
+      const up = () => { keys[key] = false; };
+      el.addEventListener('pointerdown', down);
+      window.addEventListener('pointerup', up);
+      window.addEventListener('pointercancel', up);
+    }
+    holdKey('w', document.getElementById('btnUp'));
+    holdKey('s', document.getElementById('btnDown'));
+    document.getElementById('btnPause').addEventListener('click', () => {
+      if (state === STATES.PLAYING) {
+        state = STATES.PAUSED;
+        selected = 0;
+        overlayDirty = true;
+      } else if (state === STATES.PAUSED) {
+        state = STATES.PLAYING;
+        overlayDirty = true;
+      }
+      updateHud();
+    });
+    document.getElementById('fullBtn').addEventListener('click', async () => {
+      const root = document.documentElement;
+      try {
+        if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+          if (root.requestFullscreen) await root.requestFullscreen();
+          else if (root.webkitRequestFullscreen) root.webkitRequestFullscreen();
+        } else if (document.exitFullscreen) {
+          await document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+          document.webkitExitFullscreen();
+        }
+      } catch (err) { /* ignore */ }
+      requestAnimationFrame(fitCourt);
+    });
+
+    function fitCourt() {
+      const frame = document.getElementById('courtFrame');
+      const inner = document.getElementById('courtInner');
+      const fw = frame.clientWidth;
+      const fh = frame.clientHeight;
+      if (fw < 8 || fh < 8) return;
+      const aspect = W / H;
+      const portrait = fh / fw > 1.05;
+      let w = fw;
+      let h = fh;
+      if (!portrait) {
+        h = w / aspect;
+        if (h > fh) {
+          h = fh;
+          w = h * aspect;
+        }
+      }
+      inner.style.width = Math.floor(w) + 'px';
+      inner.style.height = Math.floor(h) + 'px';
+    }
+    window.addEventListener('resize', fitCourt);
+    if (window.visualViewport) visualViewport.addEventListener('resize', fitCourt);
+    document.addEventListener('fullscreenchange', fitCourt);
 
     function hitPaddle(p) {
       return ball.x + ball.r > p.x &&
@@ -620,15 +765,18 @@
     function update() {
       if (state !== STATES.PLAYING) return;
       if (mouseLive > 0) mouseLive--;
+      if (mouseLive2 > 0) mouseLive2--;
       if (mouseLive === 0) {
         if (keys.w || keys.W) p1.y -= p1.speed;
         if (keys.s || keys.S) p1.y += p1.speed;
         paddleBounds(p1);
       }
       if (mode === 'two') {
-        if (keys.ArrowUp) p2.y -= p2.speed;
-        if (keys.ArrowDown) p2.y += p2.speed;
-        paddleBounds(p2);
+        if (mouseLive2 === 0) {
+          if (keys.ArrowUp) p2.y -= p2.speed;
+          if (keys.ArrowDown) p2.y += p2.speed;
+          paddleBounds(p2);
+        }
       } else {
         updateAI();
       }
@@ -882,6 +1030,8 @@
     resetMatch();
     overlayDirty = true;
     updateHud();
+    fitCourt();
+    requestAnimationFrame(fitCourt);
     loop();
   </script>
 </body>

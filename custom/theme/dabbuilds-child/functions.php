@@ -91,13 +91,15 @@ function dabbuilds_child_is_blog_index() {
  * @return string Empty if not found.
  */
 function dabbuilds_child_get_resume_file_url() {
-	$cached = get_transient( 'dabbuilds_resume_file_url' );
+	$known = home_url( '/wp-content/uploads/2026/08/Resume-2026-V1.doc' );
+
+	$cached = get_transient( 'dabbuilds_resume_file_url_v2' );
 	if ( is_string( $cached ) && $cached !== '' ) {
 		return $cached;
 	}
 
-	// Prefer known media filename, then page content, then media search.
-	$candidates = array();
+	// Prefer the current hosted file, then page content, then media search.
+	$candidates = array( $known );
 
 	$by_name = get_posts(
 		array(
@@ -123,7 +125,7 @@ function dabbuilds_child_get_resume_file_url() {
 		}
 	}
 
-	// Last-resort known path (current production file).
+	// Last-resort known path (previous production file).
 	$candidates[] = home_url( '/wp-content/uploads/2025/07/Resume-V5-2025.doc' );
 
 	$url = '';
@@ -135,7 +137,7 @@ function dabbuilds_child_get_resume_file_url() {
 	}
 
 	if ( $url ) {
-		set_transient( 'dabbuilds_resume_file_url', $url, HOUR_IN_SECONDS );
+		set_transient( 'dabbuilds_resume_file_url_v2', $url, HOUR_IN_SECONDS );
 	}
 
 	return $url;
@@ -227,6 +229,63 @@ function dabbuilds_child_force_templates( $template ) {
 	return $template;
 }
 add_filter( 'template_include', 'dabbuilds_child_force_templates', 99 );
+
+/**
+ * Public URL of the hosted Wimbledon Pong game.
+ *
+ * @return string
+ */
+function dabbuilds_child_play_url() {
+	return home_url( '/play/' );
+}
+
+/**
+ * Serve the standalone game at /play/ without WordPress chrome.
+ */
+function dabbuilds_child_serve_play_game() {
+	$request_uri = isset( $_SERVER['REQUEST_URI'] ) ? wp_unslash( $_SERVER['REQUEST_URI'] ) : '';
+	$path        = (string) wp_parse_url( $request_uri, PHP_URL_PATH );
+	$path        = untrailingslashit( $path );
+
+	if ( $path !== '/play' && $path !== '/play/index.html' ) {
+		return;
+	}
+
+	$file = get_stylesheet_directory() . '/play/index.html';
+	if ( ! is_readable( $file ) ) {
+		return;
+	}
+
+	status_header( 200 );
+	header( 'Content-Type: text/html; charset=utf-8' );
+	header( 'X-Robots-Tag: noindex, follow' );
+	header( 'Cache-Control: public, max-age=300' );
+	readfile( $file );
+	exit;
+}
+add_action( 'template_redirect', 'dabbuilds_child_serve_play_game', 0 );
+
+/**
+ * Point leftover Replit game links at the on-site copy.
+ *
+ * @param string $content Post content.
+ * @return string
+ */
+function dabbuilds_child_rewrite_game_url( $content ) {
+	if ( ! is_string( $content ) || $content === '' ) {
+		return $content;
+	}
+
+	$old = array(
+		'https://grokreplitopen2025.replit.app/',
+		'https://grokreplitopen2025.replit.app',
+		'http://grokreplitopen2025.replit.app/',
+		'http://grokreplitopen2025.replit.app',
+	);
+
+	return str_replace( $old, dabbuilds_child_play_url(), $content );
+}
+add_filter( 'the_content', 'dabbuilds_child_rewrite_game_url', 20 );
 
 /**
  * Extra Elementor hooks — print hero if archive location still runs.

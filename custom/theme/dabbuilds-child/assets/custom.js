@@ -86,4 +86,9 @@
       { passive: true }
     );
   }
+
+  // Replit free hosting expired; keep Play Now on-site.
+  document.querySelectorAll('a[href*="grokreplitopen2025.replit.app"]').forEach(function (link) {
+    link.setAttribute('href', '/play/');
+  });
 })();

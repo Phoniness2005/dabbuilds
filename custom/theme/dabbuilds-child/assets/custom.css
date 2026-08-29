@@ -996,6 +996,114 @@ body.single .page-content mark {
 }
 
 /* -------------------------------------------------------------------------- */
+/* Projects page                                                               */
+/* -------------------------------------------------------------------------- */
+.dab-projects__lede {
+  margin: 0 0 1.25rem;
+  max-width: 38rem;
+  color: var(--dab-muted);
+  font-size: 1.05rem;
+}
+
+.dab-project-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin: 2rem 0 2.5rem;
+}
+
+@media (max-width: 860px) {
+  .dab-project-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.dab-project-card {
+  padding: 1.25rem 1.35rem;
+  border: 1px solid var(--dab-line);
+  border-radius: var(--dab-radius);
+  background: var(--dab-panel);
+}
+
+.dab-project-card__eyebrow {
+  margin: 0 0 0.45rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--dab-cyan);
+}
+
+.dab-project-card__title {
+  margin: 0 0 0.55rem;
+  font-family: var(--dab-font-display);
+  font-size: 1.35rem;
+  letter-spacing: -0.03em;
+}
+
+.dab-project-card__body {
+  margin: 0 0 1rem;
+  color: var(--dab-muted);
+  font-size: 0.95rem;
+}
+
+.dab-project-card__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+  margin: 0;
+}
+
+.dab-project-card__links a {
+  color: var(--dab-cyan);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.dab-project-card__links a:hover {
+  text-decoration: underline;
+}
+
+.dab-projects__sub {
+  margin: 0 0 1rem;
+  font-family: var(--dab-font-display);
+  font-size: 1.2rem;
+}
+
+.dab-shot-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+@media (max-width: 700px) {
+  .dab-shot-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.dab-shot {
+  margin: 0;
+  border: 1px solid var(--dab-line);
+  border-radius: var(--dab-radius-sm);
+  overflow: hidden;
+  background: var(--dab-panel);
+}
+
+.dab-shot img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.dab-shot figcaption {
+  padding: 0.55rem 0.75rem;
+  font-size: 0.82rem;
+  color: var(--dab-dim);
+}
+
+/* -------------------------------------------------------------------------- */
 /* Footer                                                                      */
 /* -------------------------------------------------------------------------- */
 .site-footer {

@@ -212,6 +212,13 @@ function dabbuilds_child_force_templates( $template ) {
 		}
 	}
 
+	if ( is_page( 'projects' ) ) {
+		$custom = $dir . '/page-projects.php';
+		if ( file_exists( $custom ) ) {
+			return $custom;
+		}
+	}
+
 	if ( dabbuilds_child_is_blog_index() ) {
 		$custom = $dir . '/index.php';
 		if ( file_exists( $custom ) ) {
@@ -229,6 +236,28 @@ function dabbuilds_child_force_templates( $template ) {
 	return $template;
 }
 add_filter( 'template_include', 'dabbuilds_child_force_templates', 99 );
+
+/**
+ * Public URL of an uploaded screenshot by attachment slug.
+ *
+ * @param string $slug Attachment slug (filename without extension).
+ * @return string Empty if not found.
+ */
+function dabbuilds_child_shot_url( $slug ) {
+	$att = get_posts(
+		array(
+			'name'           => sanitize_title( $slug ),
+			'post_type'      => 'attachment',
+			'post_status'    => 'inherit',
+			'posts_per_page' => 1,
+		)
+	);
+	if ( empty( $att ) ) {
+		return '';
+	}
+	$url = wp_get_attachment_url( $att[0]->ID );
+	return $url ? $url : '';
+}
 
 /**
  * Public URL of the hosted Wimbledon Pong game.

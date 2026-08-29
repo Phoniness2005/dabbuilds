@@ -1,6 +1,6 @@
 <?php
 /**
- * Site header with always-on nav (Home + Resume) and mobile menu.
+ * Site header with always-on nav (Home + Projects + Resume) and mobile menu.
  *
  * @package dabbuilds-child
  */
@@ -12,7 +12,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 $site_name = get_bloginfo( 'name' );
 $tagline   = get_bloginfo( 'description', 'display' );
 $home_url  = home_url( '/' );
-$resume_url = home_url( '/dabs-resume/' );
+$resume_url   = home_url( '/dabs-resume/' );
+$projects_url = home_url( '/projects/' );
 ?>
 <header id="site-header" class="site-header">
 	<div class="site-header__inner">
@@ -48,6 +49,11 @@ $resume_url = home_url( '/dabs-resume/' );
 				<li class="dab-nav__item<?php echo is_front_page() || is_home() ? ' is-active' : ''; ?>">
 					<a class="dab-nav__link" href="<?php echo esc_url( $home_url ); ?>">
 						<?php echo esc_html__( 'Build log', 'dabbuilds-child' ); ?>
+					</a>
+				</li>
+				<li class="dab-nav__item<?php echo is_page( 'projects' ) ? ' is-active' : ''; ?>">
+					<a class="dab-nav__link" href="<?php echo esc_url( $projects_url ); ?>">
+						<?php echo esc_html__( 'Projects', 'dabbuilds-child' ); ?>
 					</a>
 				</li>
 				<li class="dab-nav__item<?php echo is_page( 'dabs-resume' ) ? ' is-active' : ''; ?>">

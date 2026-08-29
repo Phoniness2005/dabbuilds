@@ -68,6 +68,8 @@ After the first successful theme deploy:
 3. Activate **DAB Builds Child**  
 4. Confirm the site still looks correct (Hello Elementor parent must remain installed)
 
+Custom security plugin: `custom/plugins/dabbuilds-hardening/` (see [`security.md`](./security.md)).
+
 ## What this does *not* deploy
 
 - Blog posts / pages in the database  

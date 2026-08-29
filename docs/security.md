@@ -26,16 +26,12 @@ These are **not** represented as files in git:
 - Deleted unused **Envato Elements** 2.0.16 (plugin closed on WordPress.org)
 - Installed **Code Snippets** 3.10.1 and activated snippet **“DAB Builds Hardening”** (id `5`) — same PHP as the plugin above
 
-Code Snippets is a stopgap because Elementor Cloud SFTP credentials in `.env.local` no longer authenticate. After a successful SFTP plugin deploy, deactivate that snippet and uninstall Code Snippets.
+SFTP deploy on 2026-08-29 copied the plugin and child theme (including `/play/`) to Elementor Cloud, activated **DAB Builds Hardening**, and removed the Code Snippets stopgap. Public `readme.html` and `license.txt` were deleted over SFTP.
 
-## Still blocked without SFTP (or Elementor file manager)
+## Host-controlled leftovers
 
-- Copy `custom/plugins/dabbuilds-hardening/` onto the server and activate it as a real plugin
-- Copy the child-theme `/play/` files and `functions.php` so `/play/` is not a 404
-- Delete public core files `readme.html` and `license.txt` (static; PHP cannot hide them)
-- `X-Powered-By: Elementor Cloud` is host-controlled
-
-Rotate the SFTP password in Elementor Cloud and put the new value only in `.env.local` (never git).
+- `X-Powered-By: Elementor Cloud` is set by Elementor Host
+- Keep SFTP credentials only in `.env.local` (never git). Create the SFTP user with expiry **Never** so deploys keep working.
 
 ## Intentionally unchanged
 

@@ -10,7 +10,7 @@ Hosted at `/play/` from the child theme. Source of the game itself is also in [P
 | `/play/v2/` | August 2026 rebuild. |
 | `/play/v1/` | Original 2025 Grok/Replit build, unchanged. |
 
-`functions.php` serves those files without WordPress chrome as a fallback. Elementor Cloud intercepts `.jpg` before PHP, so `deploy-sftp.sh` also copies `play/` to `/html/play/` on the web root. Prefer `/play/v2/index.html` over `/play/v2/` so a cached directory 404 cannot stick.
+`functions.php` serves the HTML without WordPress chrome. Do not place a real `/html/play/` directory on the web root: Elementor/nginx treats it as a static folder, directory URLs 403, and `/play/` never reaches PHP. Version 2 loads textures from the theme URL on dabbuilds.com (`/wp-content/themes/dabbuilds-child/play/v2/assets/`) and from relative `assets/` on GitHub Pages.
 
 ## Version 1 analysis (what was wrong)
 

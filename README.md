@@ -23,7 +23,7 @@ This repo is the source of truth for:
 | CMS | WordPress |
 | Host | Elementor Cloud |
 | CDN | Cloudflare |
-| GitHub | https://github.com/Phoniness2005/dabbuilds |
+| GitHub | https://github.com/Phoniness2005/dabbuilds (public) |
 
 ## Repo layout
 
@@ -63,4 +63,4 @@ SFTP credentials: `.env.local` only (gitignored). Details: [`docs/deploy.md`](do
 
 **Phase 1 — established:** repo, docs, folders for custom code.  
 **Phase 2 — connected:** SFTP to Elementor Cloud (`/html`), child theme scaffold, deploy scripts.  
-**Phase 3 — iterate:** implement tracked changes with agent assistance; activate child theme after first deploy.
+**Phase 3 — iterate:** child theme, `/play/`, resume hosting, and the `dabbuilds-hardening` plugin are live. This repo is public.

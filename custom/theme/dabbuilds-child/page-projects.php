@@ -58,7 +58,7 @@ $shots = array(
 				<p class="dab-project-card__eyebrow">Game</p>
 				<h2 class="dab-project-card__title">Wimbledon Pong</h2>
 				<p class="dab-project-card__body">
-					<?php echo esc_html__( 'The Wimbledon-colored Pong clone I vibe-coded with Grok. Replit free hosting expired, so it lives at /play/ now. Source is on GitHub.', 'dabbuilds-child' ); ?>
+					<?php echo esc_html__( 'The Wimbledon-colored Pong clone I vibe-coded with Grok. Replit free hosting expired, so it lives at /play/ now — version 2 on top, the original underneath. Source is on GitHub.', 'dabbuilds-child' ); ?>
 				</p>
 				<p class="dab-project-card__links">
 					<a href="<?php echo esc_url( home_url( '/play/' ) ); ?>"><?php echo esc_html__( 'Play', 'dabbuilds-child' ); ?></a>

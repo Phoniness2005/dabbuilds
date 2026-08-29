@@ -64,11 +64,37 @@ plan_theme() {
   while IFS= read -r -d '' f; do
     rel="${f#${CHILD_THEME_LOCAL}/}"
     [[ "$(basename "$f")" == ".gitkeep" ]] && continue
-    if [[ "$(dirname "$rel")" != "." ]]; then
-      CMDS+=("mkdir ${CHILD_THEME_REMOTE}/$(dirname "$rel")")
-    fi
+    mkdir_parents "${CHILD_THEME_REMOTE}" "$(dirname "$rel")"
     CMDS+=("put ${f} ${CHILD_THEME_REMOTE}/${rel}")
   done < <(find "${CHILD_THEME_LOCAL}" -type f -print0 | sort -z)
+
+  # Elementor serves .jpg from the web root, not via theme PHP. Mirror the
+  # game there so /play/v2/assets/*.jpg is a real file instead of a 302.
+  PLAY_LOCAL="${CHILD_THEME_LOCAL}/play"
+  PLAY_REMOTE="${SFTP_REMOTE_ROOT}/play"
+  if [[ -d "${PLAY_LOCAL}" ]]; then
+    echo "Play:   ${PLAY_LOCAL}  ->  ${PLAY_REMOTE}"
+    CMDS+=("mkdir ${PLAY_REMOTE}")
+    while IFS= read -r -d '' f; do
+      rel="${f#${PLAY_LOCAL}/}"
+      mkdir_parents "${PLAY_REMOTE}" "$(dirname "$rel")"
+      CMDS+=("put ${f} ${PLAY_REMOTE}/${rel}")
+    done < <(find "${PLAY_LOCAL}" -type f -print0 | sort -z)
+  fi
+}
+
+mkdir_parents() {
+  local root="$1"
+  local rel="$2"
+  local dir="$root"
+  [[ "$rel" == "." || -z "$rel" ]] && return
+  local IFS=/
+  local part
+  for part in $rel; do
+    [[ -z "$part" ]] && continue
+    dir="${dir}/${part}"
+    CMDS+=("mkdir ${dir}")
+  done
 }
 
 plan_plugins() {

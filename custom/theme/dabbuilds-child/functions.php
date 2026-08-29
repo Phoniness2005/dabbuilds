@@ -269,27 +269,46 @@ function dabbuilds_child_play_url() {
 }
 
 /**
- * Serve the standalone game at /play/ without WordPress chrome.
+ * Serve the Pong hub and versioned game files at /play/ without WordPress chrome.
  */
 function dabbuilds_child_serve_play_game() {
 	$request_uri = isset( $_SERVER['REQUEST_URI'] ) ? wp_unslash( $_SERVER['REQUEST_URI'] ) : '';
 	$path        = (string) wp_parse_url( $request_uri, PHP_URL_PATH );
 	$path        = untrailingslashit( $path );
 
-	if ( $path !== '/play' && $path !== '/play/index.html' ) {
+	$rel = '';
+	if ( $path === '/play' || $path === '/play/index.html' ) {
+		$rel = 'index.html';
+	} elseif ( preg_match( '#^/play/(v[12])$#', $path, $m ) ) {
+		$rel = $m[1] . '/index.html';
+	} elseif ( preg_match( '#^/play/(v[12]/(?:index\.html|assets/[a-z0-9._-]+\.(?:jpg|jpeg|png|gif)))$#i', $path, $m ) ) {
+		$rel = $m[1];
+	} else {
 		return;
 	}
 
-	$file = get_stylesheet_directory() . '/play/index.html';
-	if ( ! is_readable( $file ) ) {
+	$file = get_stylesheet_directory() . '/play/' . $rel;
+	$real_play = realpath( get_stylesheet_directory() . '/play' );
+	$real_file = realpath( $file );
+	if ( ! $real_play || ! $real_file || strpos( $real_file, $real_play ) !== 0 || ! is_readable( $real_file ) ) {
 		return;
+	}
+
+	$ext  = strtolower( pathinfo( $real_file, PATHINFO_EXTENSION ) );
+	$mime = 'text/html; charset=utf-8';
+	if ( 'jpg' === $ext || 'jpeg' === $ext ) {
+		$mime = 'image/jpeg';
+	} elseif ( 'png' === $ext ) {
+		$mime = 'image/png';
+	} elseif ( 'gif' === $ext ) {
+		$mime = 'image/gif';
 	}
 
 	status_header( 200 );
-	header( 'Content-Type: text/html; charset=utf-8' );
+	header( 'Content-Type: ' . $mime );
 	header( 'X-Robots-Tag: noindex, follow' );
-	header( 'Cache-Control: public, max-age=300' );
-	readfile( $file );
+	header( 'Cache-Control: public, max-age=60, must-revalidate' );
+	readfile( $real_file );
 	exit;
 }
 add_action( 'template_redirect', 'dabbuilds_child_serve_play_game', 0 );

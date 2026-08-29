@@ -3,524 +3,61 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Wimbledon Pong</title>
+  <title>Wimbledon Pong — Version 1 and 2</title>
   <style>
+    :root { --purple: #4b286d; --green: #16331a; --white: #f4f7f2; }
+    * { box-sizing: border-box; }
     body {
       margin: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      background-color: #1b3c1f; /* Wimbledon dark green */
-      overflow: hidden;
-      font-family: 'Courier New', monospace;
+      background: radial-gradient(ellipse at top, #1e4a24, var(--green));
+      color: var(--white);
+      font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+      padding: 24px 16px 48px;
     }
-    canvas {
-      border: 8px solid #4b286d; /* Thicker Wimbledon purple border */
-      box-shadow: 0 0 0 4px #ffffff; /* White outer border for contrast */
-      background-color: #2e7d32; /* Grass court green */
-      image-rendering: pixelated; /* For retro SNES look */
+    .page { max-width: 1100px; margin: 0 auto; }
+    h1 { margin: 0 0 8px; font-size: clamp(28px, 4vw, 42px); text-shadow: 0 3px 0 #2a1540; }
+    .lede { max-width: 42rem; line-height: 1.5; color: #e6ffb0; }
+    .edition { margin: 36px 0; }
+    .edition h2 { margin: 0 0 6px; font-size: 22px; }
+    .edition p { margin: 0 0 12px; color: #d7c4ee; }
+    .frame {
+      background: #0c1a0e;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.4);
     }
-    #score {
-      position: absolute;
-      top: 20px;
+    iframe {
+      display: block;
       width: 100%;
-      text-align: center;
-      font-size: 48px;
-      color: #ffffff;
-      text-shadow: 3px 3px #4b286d;
+      height: min(82vh, 880px);
+      border: 0;
+      background: #16331a;
     }
-    #stats {
-      position: absolute;
-      top: 80px;
-      width: 100%;
-      text-align: center;
-      font-size: 32px;
-      color: #ffffff;
-      text-shadow: 2px 2px #4b286d;
-    }
-    #ui {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      color: #ffffff;
-      text-shadow: 2px 2px #4b286d;
-      font-size: 36px;
-      text-align: center;
-    }
-    #ui div {
-      margin: 10px;
-      padding: 10px;
-      cursor: pointer;
-    }
-    #ui .selected {
-      background-color: #4b286d;
-      color: #ffffff;
-    }
-    #ui .instructions {
-      position: absolute;
-      bottom: 20px;
-      font-size: 24px;
-      color: #c6ff00;
-    }
+    a { color: #d4ff3f; }
   </style>
 </head>
 <body>
-  <div id="score">0 - 0</div>
-  <div id="stats">Game 1 | P1 Wins: 0 | P2 Wins: 0</div>
-  <div id="ui"></div>
-  <canvas id="gameCanvas" width="1200" height="900"></canvas>
-  <script>
-    const canvas = document.getElementById('gameCanvas');
-    const ctx = canvas.getContext('2d');
-    const scoreDisplay = document.getElementById('score');
-    const statsDisplay = document.getElementById('stats');
-    const ui = document.getElementById('ui');
+  <div class="page">
+    <h1>Wimbledon Pong</h1>
+    <p class="lede">
+      Version 2 is the cleaned-up court: menus you can click, an opponent that actually changes
+      with the skill setting, and graphics that sit inside the same lines the ball uses.
+      Version 1 is the original Grok/Replit build, kept underneath so you can see what changed.
+    </p>
 
-    // Game states
-    const states = {
-      MENU: 'menu',
-      DIFFICULTY: 'difficulty',
-      PLAYING: 'playing',
-      PAUSED: 'paused',
-      GAME_OVER: 'game_over',
-      CELEBRATION: 'celebration',
-      REMATCH: 'rematch',
-      POST_WIN: 'post_win'
-    };
-    let gameState = states.MENU;
-    let selectedOption = 0;
-    let gameMode = null;
-    let difficulty = null;
-    const maxScore = 10; // Reduced from 15
-    let gameNumber = 1;
-    let player1Wins = 0;
-    let player2Wins = 0;
-    let lastWinner = null;
-    let gameOverTimer = null;
+    <section class="edition" id="v2">
+      <h2>Version 2 — Centre Court</h2>
+      <p>Click a choice or use the arrow keys and Enter. W and S move your paddle; the mouse works too while the ball is in play.</p>
+      <div class="frame">
+        <iframe src="v2/index.html" title="Wimbledon Pong version 2" allow="autoplay"></iframe>
+      </div>
+    </section>
 
-    // Game objects
-    const ball = {
-      x: canvas.width / 2,
-      y: canvas.height / 2,
-      radius: 12,
-      speedX: 7,
-      speedY: 7,
-      color: '#c6ff00', // Tennis ball yellow-green
-      trail: []
-    };
-
-    const paddle1 = {
-      x: 30,
-      y: canvas.height / 2 - 75,
-      width: 15,
-      height: 150,
-      speed: 10,
-      score: 0,
-      color: '#d2b48c' // Light wood grain (tan)
-    };
-
-    const paddle2 = {
-      x: canvas.width - 45,
-      y: canvas.height / 2 - 75,
-      width: 15,
-      height: 150,
-      speed: 10,
-      score: 0,
-      color: '#8b5a2b' // Darker wood grain (brown)
-    };
-
-    // Crowd animation state
-    let crowdCheer = false;
-    let crowdFrame = 0;
-    const crowdFrameDelay = 8;
-    let crowdFrameCounter = 0;
-    const crowdFrames = 4;
-
-    // Sound effects
-    function playSound(frequency, duration) {
-      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      const oscillator = audioCtx.createOscillator();
-      oscillator.type = 'square';
-      oscillator.frequency.setValueAtTime(frequency, audioCtx.currentTime);
-      oscillator.connect(audioCtx.destination);
-      oscillator.start();
-      oscillator.stop(audioCtx.currentTime + duration);
-    }
-
-    // Keyboard controls
-    const keys = {
-      w: false,
-      s: false,
-      ArrowUp: false,
-      ArrowDown: false,
-      p: false,
-      Enter: false,
-      Escape: false,
-      ArrowLeft: false,
-      ArrowRight: false
-    };
-
-    document.addEventListener('keydown', (e) => {
-      if (e.key in keys) keys[e.key] = true;
-    });
-
-    document.addEventListener('keyup', (e) => {
-      if (e.key in keys) keys[e.key] = false;
-    });
-
-    // Draw net
-    function drawNet() {
-      ctx.fillStyle = '#ffffff';
-      for (let y = 0; y < canvas.height; y += 30) {
-        ctx.fillRect(canvas.width / 2 - 3, y, 6, 15);
-      }
-    }
-
-    // Draw crowd
-    function drawCrowd() {
-      const crowdHeight = 75;
-      const spriteSize = 24;
-      ctx.fillStyle = '#4b286d';
-      ctx.fillRect(0, 0, canvas.width, crowdHeight);
-      ctx.fillRect(0, canvas.height - crowdHeight, canvas.width, crowdHeight);
-
-      for (let x = 0; x < canvas.width; x += spriteSize) {
-        const color = crowdCheer ? ['#ffeb3b', '#ffffff', '#c6ff00', '#ffeb3b'][crowdFrame] : '#ffffff';
-        ctx.fillStyle = color;
-        ctx.fillRect(x + 6, 15, 12, 12);
-        ctx.fillRect(x + 6, canvas.height - crowdHeight + 15, 12, 12);
-        ctx.fillStyle = crowdCheer ? '#ffffff' : '#cccccc';
-        ctx.fillRect(x + 8, 17, 4, 4);
-        ctx.fillRect(x + 8, canvas.height - crowdHeight + 17, 4, 4);
-      }
-    }
-
-    // Draw center graphic
-    function drawCenterGraphic() {
-      ctx.font = '48px Courier New';
-      ctx.textAlign = 'center';
-      ctx.fillStyle = 'rgba(198, 255, 0, 0.3)'; // Translucent yellow-green
-      ctx.fillText('Grok/Replit Open 2025', canvas.width / 2, canvas.height / 2);
-      ctx.strokeStyle = 'rgba(75, 40, 109, 0.5)'; // Translucent Wimbledon purple outline
-      ctx.lineWidth = 2;
-      ctx.strokeText('Grok/Replit Open 2025', canvas.width / 2, canvas.height / 2);
-    }
-
-    // Update crowd animation
-    function updateCrowd() {
-      if (crowdCheer) {
-        crowdFrameCounter++;
-        if (crowdFrameCounter >= crowdFrameDelay) {
-          crowdFrame = (crowdFrame + 1) % crowdFrames;
-          crowdFrameCounter = 0;
-        }
-      } else {
-        crowdFrame = 0;
-        crowdFrameCounter = 0;
-      }
-    }
-
-    // AI for one-player mode
-    function updateAI() {
-      if (gameMode === 'one') {
-        const targetY = ball.y - paddle2.height / 2;
-        let aiSpeed = difficulty === 'Amateur' ? 6 : difficulty === 'Tour' ? 8 : 10;
-        const error = difficulty === 'Amateur' ? 50 : difficulty === 'Tour' ? 25 : 0;
-        const adjustedTarget = targetY + (Math.random() * error - error / 2);
-        if (paddle2.y + paddle2.height / 2 < adjustedTarget) {
-          paddle2.y += aiSpeed;
-        } else if (paddle2.y + paddle2.height / 2 > adjustedTarget) {
-          paddle2.y -= aiSpeed;
-        }
-        if (paddle2.y < 0) paddle2.y = 0;
-        if (paddle2.y > canvas.height - paddle2.height) paddle2.y = canvas.height - paddle2.height;
-      }
-    }
-
-    // Reset game state for new match
-    function resetGame() {
-      paddle1.score = 0;
-      paddle2.score = 0;
-      resetBall();
-      paddle1.y = canvas.height / 2 - 75;
-      paddle2.y = canvas.height / 2 - 75;
-      scoreDisplay.textContent = `0 - 0`;
-    }
-
-    // Update game state
-    function update() {
-      if (gameState === states.PLAYING) {
-        // Move paddles (ensure they stay within visual field)
-        if (keys.w && paddle1.y > 0) paddle1.y = Math.max(0, paddle1.y - paddle1.speed);
-        if (keys.s && paddle1.y < canvas.height - paddle1.height) paddle1.y = Math.min(canvas.height - paddle1.height, paddle1.y + paddle1.speed);
-        if (gameMode === 'two') {
-          if (keys.ArrowUp && paddle2.y > 0) paddle2.y = Math.max(0, paddle2.y - paddle2.speed);
-          if (keys.ArrowDown && paddle2.y < canvas.height - paddle2.height) paddle2.y = Math.min(canvas.height - paddle2.height, paddle2.y + paddle2.speed);
-        } else {
-          updateAI();
-        }
-
-        // Move ball (ensure it stays within visual field)
-        ball.x += ball.speedX;
-        ball.y += ball.speedY;
-
-        // Update ball trail
-        ball.trail.push({ x: ball.x, y: ball.y });
-        if (ball.trail.length > 5) ball.trail.shift();
-
-        // Ball collision with top and bottom (adjusted for visibility)
-        if (ball.y + ball.radius > canvas.height - 8 || ball.y - ball.radius < 8) { // Account for border thickness
-          ball.speedY = -ball.speedY;
-          ball.y = ball.y + ball.radius > canvas.height - 8 ? canvas.height - 8 - ball.radius : 8 + ball.radius;
-          playSound(300, 0.1);
-        }
-
-        // Ball collision with paddles
-        if (
-          (ball.x - ball.radius < paddle1.x + paddle1.width &&
-           ball.y > paddle1.y &&
-           ball.y < paddle1.y + paddle1.height) ||
-          (ball.x + ball.radius > paddle2.x &&
-           ball.y > paddle2.y &&
-           ball.y < paddle2.y + paddle2.height)
-        ) {
-          ball.speedX = -ball.speedX * 1.05;
-          // Ensure ball stays within left/right bounds
-          if (ball.x - ball.radius < paddle1.x + paddle1.width) ball.x = paddle1.x + paddle1.width + ball.radius;
-          if (ball.x + ball.radius > paddle2.x) ball.x = paddle2.x - ball.radius;
-          playSound(400, 0.1);
-        }
-
-        // Score points (adjusted for border)
-        if (ball.x < 8) {
-          paddle2.score++;
-          resetBall();
-          crowdCheer = true;
-          playSound(200, 0.3);
-        } else if (ball.x > canvas.width - 8) {
-          paddle1.score++;
-          resetBall();
-          crowdCheer = true;
-          playSound(200, 0.3);
-        }
-
-        // Check for game end
-        if (paddle1.score >= maxScore || paddle2.score >= maxScore) {
-          lastWinner = paddle1.score >= maxScore ? 'Player 1' : gameMode === 'two' ? 'Player 2' : 'Computer';
-          if (paddle1.score >= maxScore) player1Wins++;
-          else player2Wins++;
-          gameState = states.REMATCH;
-          selectedOption = 0;
-          crowdCheer = true;
-        }
-
-        // Update crowd
-        updateCrowd();
-
-        // Pause game
-        if (keys.p) {
-          gameState = states.PAUSED;
-          keys.p = false;
-        }
-
-        // Update stats
-        statsDisplay.textContent = `Game ${gameNumber} | P1 Wins: ${player1Wins} | P2 Wins: ${player2Wins}`;
-      } else if (gameState === states.PAUSED && keys.p) {
-        gameState = states.PLAYING;
-        keys.p = false;
-      } else if (gameState === states.MENU) {
-        if (keys.ArrowUp && selectedOption > 0) {
-          selectedOption--;
-          playSound(500, 0.1);
-        }
-        if (keys.ArrowDown && selectedOption < 1) {
-          selectedOption++;
-          playSound(500, 0.1);
-        }
-        if (keys.Enter) {
-          gameMode = selectedOption === 0 ? 'one' : 'two';
-          if (gameMode === 'one') {
-            gameState = states.DIFFICULTY;
-            selectedOption = 0;
-          } else {
-            gameState = states.PLAYING;
-            ui.innerHTML = '';
-          }
-          keys.Enter = false;
-          playSound(600, 0.2);
-        }
-      } else if (gameState === states.DIFFICULTY) {
-        if (keys.ArrowUp && selectedOption > 0) {
-          selectedOption--;
-          playSound(500, 0.1);
-        }
-        if (keys.ArrowDown && selectedOption < 2) {
-          selectedOption++;
-          playSound(500, 0.1);
-        }
-        if (keys.Enter) {
-          difficulty = ['Amateur', 'Tour', 'Pro'][selectedOption];
-          gameState = states.PLAYING;
-          ui.innerHTML = '';
-          keys.Enter = false;
-          playSound(600, 0.2);
-        }
-      } else if (gameState === states.REMATCH) {
-        if (keys.ArrowUp && selectedOption > 0) {
-          selectedOption--;
-          playSound(500, 0.1);
-        }
-        if (keys.ArrowDown && selectedOption < 1) {
-          selectedOption++;
-          playSound(500, 0.1);
-        }
-        if (keys.Enter) {
-          if (selectedOption === 0) {
-            gameState = states.POST_WIN;
-            setTimeout(() => {
-              gameState = states.PLAYING;
-              gameNumber++;
-              resetGame();
-              ui.innerHTML = '';
-            }, 2000);
-          } else {
-            gameState = states.MENU;
-            selectedOption = 0;
-            gameNumber = 1;
-            player1Wins = 0;
-            player2Wins = 0;
-            resetGame();
-          }
-          keys.Enter = false;
-          playSound(600, 0.2);
-        }
-      } else if (gameState === states.GAME_OVER) {
-        if (!gameOverTimer) {
-          gameOverTimer = setTimeout(() => {
-            gameState = states.MENU;
-            selectedOption = 0;
-            gameNumber = 1;
-            player1Wins = 0;
-            player2Wins = 0;
-            resetGame();
-            gameOverTimer = null;
-            ui.innerHTML = '';
-          }, 5000);
-        }
-      }
-
-      // Game over on Escape
-      if (keys.Escape && gameState !== states.GAME_OVER) {
-        gameState = states.GAME_OVER;
-        keys.Escape = false;
-        crowdCheer = false;
-        playSound(150, 0.5);
-      }
-    }
-
-    // Reset ball
-    function resetBall() {
-      ball.x = canvas.width / 2;
-      ball.y = canvas.height / 2;
-      ball.speedX = (Math.random() > 0.5 ? 7 : -7) * (Math.random() * 0.5 + 0.75);
-      ball.speedY = (Math.random() > 0.5 ? 7 : -7) * (Math.random() * 0.5 + 0.75);
-      ball.trail = [];
-      setTimeout(() => { crowdCheer = false; }, 1000);
-    }
-
-    // Draw game
-    function draw() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      drawCrowd();
-      drawNet();
-      drawCenterGraphic();
-
-      if (gameState === states.PLAYING || gameState === states.PAUSED) {
-        // Draw paddles
-        ctx.fillStyle = paddle1.color;
-        ctx.fillRect(paddle1.x, paddle1.y, paddle1.width, paddle1.height);
-        ctx.fillStyle = paddle2.color;
-        ctx.fillRect(paddle2.x, paddle2.y, paddle2.width, paddle2.height);
-
-        // Draw ball trail
-        ball.trail.forEach((pos, i) => {
-          ctx.beginPath();
-          ctx.arc(pos.x, pos.y, ball.radius * (0.5 + 0.1 * i), 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(198, 255, 0, ${0.2 * (i / ball.trail.length)})`;
-          ctx.fill();
-          ctx.closePath();
-        });
-
-        // Draw ball
-        ctx.beginPath();
-        ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
-        ctx.fillStyle = ball.color;
-        ctx.fill();
-        ctx.closePath();
-
-        // Update score
-        scoreDisplay.textContent = `${paddle1.score} - ${paddle2.score}`;
-
-        // Draw pause message
-        if (gameState === states.PAUSED) {
-          ctx.fillStyle = '#ffffff';
-          ctx.font = '64px Courier New';
-          ctx.textAlign = 'center';
-          ctx.fillText('Paused', canvas.width / 2, canvas.height / 2);
-        }
-      } else if (gameState === states.MENU) {
-        ui.innerHTML = `
-          <div class="${selectedOption === 0 ? 'selected' : ''}">One Player</div>
-          <div class="${selectedOption === 1 ? 'selected' : ''}">Two Players</div>
-          <div class="instructions">
-            Player 1: W (Up), S (Down), P (Pause)${selectedOption === 1 ? '<br>Player 2: Arrow Up, Arrow Down' : ''}
-          </div>
-        `;
-        statsDisplay.textContent = `Game ${gameNumber} | P1 Wins: ${player1Wins} | P2 Wins: ${player2Wins}`;
-      } else if (gameState === states.DIFFICULTY) {
-        ui.innerHTML = `
-          <div class="${selectedOption === 0 ? 'selected' : ''}">Amateur</div>
-          <div class="${selectedOption === 1 ? 'selected' : ''}">Tour</div>
-          <div class="${selectedOption === 2 ? 'selected' : ''}">Pro</div>
-          <div class="instructions">
-            Player 1: W (Up), S (Down), P (Pause)
-          </div>
-        `;
-      } else if (gameState === states.REMATCH) {
-        ui.innerHTML = `
-          <div>Do you want another match?</div>
-          <div class="${selectedOption === 0 ? 'selected' : ''}">Yes</div>
-          <div class="${selectedOption === 1 ? 'selected' : ''}">No</div>
-        `;
-        scoreDisplay.textContent = `${paddle1.score} - ${paddle2.score}`;
-      } else if (gameState === states.POST_WIN) {
-        ui.innerHTML = `
-          <div>Good job, ${lastWinner}!</div>
-        `;
-        scoreDisplay.textContent = `${paddle1.score} - ${paddle2.score}`;
-      } else if (gameState === states.GAME_OVER) {
-        ui.innerHTML = `
-          <div>Game Over</div>
-        `;
-        scoreDisplay.textContent = `${paddle1.score} - ${paddle2.score}`;
-      }
-    }
-
-    // Game loop
-    function gameLoop() {
-      update();
-      draw();
-      requestAnimationFrame(gameLoop);
-    }
-
-    // Start game
-    resetBall();
-    gameLoop();
-  </script>
+    <section class="edition" id="v1">
+      <h2>Version 1 — Original Grok/Replit build</h2>
+      <p>The first pass, as published in 2025. Keyboard only. Amateur / Tour / Pro were mostly the same bot with different jitter.</p>
+      <div class="frame">
+        <iframe src="v1/index.html" title="Wimbledon Pong version 1" allow="autoplay"></iframe>
+      </div>
+    </section>
+  </div>
 </body>
 </html>

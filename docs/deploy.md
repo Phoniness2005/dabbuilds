@@ -57,6 +57,7 @@ cd ~/Projects/dabbuilds
 | Local path | Remote path |
 |------------|-------------|
 | `custom/theme/dabbuilds-child/` | `/html/wp-content/themes/dabbuilds-child/` |
+| `custom/theme/dabbuilds-child/play/` | `/html/play/` (static copy; Elementor only serves `.jpg` from the web root) |
 | `custom/plugins/<name>/` | `/html/wp-content/plugins/<name>/` |
 
 ## First-time theme activation

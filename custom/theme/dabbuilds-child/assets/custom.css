@@ -64,10 +64,16 @@ html {
   scroll-behavior: smooth;
   color-scheme: light;
   background: var(--dab-ground) !important;
+  overflow-x: clip;
 }
 
 html[data-dab-period="night"] {
   color-scheme: dark;
+}
+
+html[data-dab-period] body {
+  background-color: var(--dab-ground) !important;
+  background-image: none !important;
 }
 
 body {
@@ -408,6 +414,7 @@ body.dab-nav-open .dab-nav-toggle__bar:nth-child(3) {
   position: relative;
   max-width: var(--dab-max);
   margin: 0 auto;
+  min-width: 0;
 }
 
 .dab-hero__eyebrow {

@@ -59,8 +59,15 @@ This repo is the source of truth for:
 
 SFTP credentials: `.env.local` only (gitignored). Details: [`docs/deploy.md`](docs/deploy.md).
 
+## Look and lighting
+
+The child theme treats the site as an object whose illumination follows the **viewer’s local clock** in one-hour steps (Auto / Day / Night override). Principles and tokens: [`docs/design-language.md`](docs/design-language.md). Drop-in guide for other WordPress sites: [`docs/lighting.md`](docs/lighting.md).
+
+Debug a specific hour: `https://dabbuilds.com/?dab-hour=12` (midday) or `?dab-hour=22` (evening).
+
 ## Status
 
 **Phase 1 — established:** repo, docs, folders for custom code.  
 **Phase 2 — connected:** SFTP to Elementor Cloud (`/html`), child theme scaffold, deploy scripts.  
-**Phase 3 — iterate:** child theme, `/play/`, resume hosting, and the `dabbuilds-hardening` plugin are live. This repo is public.
+**Phase 3 — iterate:** child theme, `/play/`, resume hosting, and the `dabbuilds-hardening` plugin are live. This repo is public.  
+**Phase 4 — object lighting:** Body Shop-derived materials, 24 hourly palettes, documented for reuse.

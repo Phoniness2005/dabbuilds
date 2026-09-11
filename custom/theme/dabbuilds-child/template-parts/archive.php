@@ -1,6 +1,6 @@
 <?php
 /**
- * Blog / archive listing with techno-optimistic hero on the main blog index.
+ * Blog / archive listing with home hero on the main blog index.
  *
  * @package dabbuilds-child
  */

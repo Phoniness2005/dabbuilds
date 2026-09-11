@@ -1,6 +1,6 @@
 <?php
 /**
- * Single post / generic page layout matching the DAB design system.
+ * Product-page layout for a single post or page.
  *
  * @package dabbuilds-child
  */
@@ -16,25 +16,18 @@ while ( have_posts() ) :
 		<article class="dab-article">
 			<header class="dab-article__header">
 				<a class="dab-back" href="<?php echo esc_url( home_url( '/' ) ); ?>">
-					<span aria-hidden="true">←</span>
 					<?php echo esc_html__( 'Build log', 'dabbuilds-child' ); ?>
 				</a>
 
-				<?php if ( is_singular( 'post' ) ) : ?>
-					<p class="dab-article__eyebrow">
-						<?php
-						echo esc_html(
-							sprintf(
-								/* translators: %s: post date */
-								__( 'Build log · %s', 'dabbuilds-child' ),
-								get_the_date()
-							)
-						);
-						?>
-					</p>
-				<?php else : ?>
-					<p class="dab-article__eyebrow"><?php echo esc_html__( 'Page', 'dabbuilds-child' ); ?></p>
-				<?php endif; ?>
+				<p class="dab-article__eyebrow">
+					<?php
+					if ( is_singular( 'post' ) ) {
+						echo esc_html( get_the_date( 'Y.m.d' ) );
+					} else {
+						echo esc_html__( 'Page', 'dabbuilds-child' );
+					}
+					?>
+				</p>
 
 				<?php the_title( '<h1 class="entry-title dab-article__title">', '</h1>' ); ?>
 

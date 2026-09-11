@@ -1,6 +1,6 @@
 <?php
 /**
- * Projects page — live demos and public source for employers.
+ * Projects page — catalog of things you can click.
  *
  * Template hierarchy: page-projects.php
  *
@@ -14,17 +14,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 get_header();
 
 $shots = array(
-	'homepage'          => __( 'Site home', 'dabbuilds-child' ),
-	'play'              => __( 'Wimbledon Pong', 'dabbuilds-child' ),
-	'resume'            => __( 'Resume 2026', 'dabbuilds-child' ),
-	'github-dabbuilds'  => __( 'Site source on GitHub', 'dabbuilds-child' ),
+	'homepage'         => __( 'Site home', 'dabbuilds-child' ),
+	'play'             => __( 'Wimbledon Pong', 'dabbuilds-child' ),
+	'resume'           => __( 'Resume 2026', 'dabbuilds-child' ),
+	'github-dabbuilds' => __( 'Site source on GitHub', 'dabbuilds-child' ),
 );
 ?>
 <main id="content" class="site-main dab-singular dab-projects-page">
 	<article class="dab-article dab-projects">
 		<header class="dab-article__header">
 			<a class="dab-back" href="<?php echo esc_url( home_url( '/' ) ); ?>">
-				<span aria-hidden="true">←</span>
 				<?php echo esc_html__( 'Build log', 'dabbuilds-child' ); ?>
 			</a>
 			<p class="dab-article__eyebrow"><?php echo esc_html__( 'Things you can actually click', 'dabbuilds-child' ); ?></p>
@@ -42,38 +41,47 @@ $shots = array(
 			</div>
 		</header>
 
-		<section class="dab-project-grid" aria-label="<?php echo esc_attr__( 'Featured projects', 'dabbuilds-child' ); ?>">
-			<article class="dab-project-card">
-				<p class="dab-project-card__eyebrow">Live</p>
-				<h2 class="dab-project-card__title">dabbuilds.com</h2>
-				<p class="dab-project-card__body">
-					<?php echo esc_html__( 'This site. Child theme, resume viewer, build log, and a little security plugin I added after poking at it. The source is public on GitHub.', 'dabbuilds-child' ); ?>
-				</p>
-				<p class="dab-project-card__links">
-					<a href="<?php echo esc_url( home_url( '/' ) ); ?>"><?php echo esc_html__( 'Open site', 'dabbuilds-child' ); ?></a>
-					<a href="https://github.com/Phoniness2005/dabbuilds" rel="noopener noreferrer"><?php echo esc_html__( 'Source', 'dabbuilds-child' ); ?></a>
-				</p>
+		<section class="dab-project-index" aria-label="<?php echo esc_attr__( 'Featured projects', 'dabbuilds-child' ); ?>">
+			<article class="dab-project-row">
+				<span class="dab-catalog__index">001</span>
+				<div class="dab-project-row__body">
+					<p class="dab-project-card__eyebrow">Live</p>
+					<h2 class="dab-project-card__title">dabbuilds.com</h2>
+					<p class="dab-project-card__body">
+						<?php echo esc_html__( 'This site. Child theme, resume viewer, build log, and a little security plugin I added after poking at it. The source is public on GitHub.', 'dabbuilds-child' ); ?>
+					</p>
+					<p class="dab-project-card__links">
+						<a href="<?php echo esc_url( home_url( '/' ) ); ?>"><?php echo esc_html__( 'Open site', 'dabbuilds-child' ); ?></a>
+						<a href="https://github.com/Phoniness2005/dabbuilds" rel="noopener noreferrer"><?php echo esc_html__( 'Source', 'dabbuilds-child' ); ?></a>
+					</p>
+				</div>
 			</article>
-			<article class="dab-project-card">
-				<p class="dab-project-card__eyebrow">Game</p>
-				<h2 class="dab-project-card__title">Wimbledon Pong</h2>
-				<p class="dab-project-card__body">
-					<?php echo esc_html__( 'The Wimbledon-colored Pong clone I vibe-coded with Grok. Replit free hosting expired, so it lives at /play/ now. Version 2 and the original both open in their own windows. Source is on GitHub.', 'dabbuilds-child' ); ?>
-				</p>
-				<p class="dab-project-card__links">
-					<a href="<?php echo esc_url( home_url( '/play/' ) ); ?>"><?php echo esc_html__( 'Play', 'dabbuilds-child' ); ?></a>
-					<a href="https://github.com/Phoniness2005/grok-replit-open-2025" rel="noopener noreferrer"><?php echo esc_html__( 'Source', 'dabbuilds-child' ); ?></a>
-				</p>
+			<article class="dab-project-row">
+				<span class="dab-catalog__index">002</span>
+				<div class="dab-project-row__body">
+					<p class="dab-project-card__eyebrow">Game</p>
+					<h2 class="dab-project-card__title">Wimbledon Pong</h2>
+					<p class="dab-project-card__body">
+						<?php echo esc_html__( 'The Wimbledon-colored Pong clone I vibe-coded with Grok. Replit free hosting expired, so it lives at /play/ now. Version 2 and the original both open in their own windows. Source is on GitHub.', 'dabbuilds-child' ); ?>
+					</p>
+					<p class="dab-project-card__links">
+						<a href="<?php echo esc_url( home_url( '/play/' ) ); ?>"><?php echo esc_html__( 'Play', 'dabbuilds-child' ); ?></a>
+						<a href="https://github.com/Phoniness2005/grok-replit-open-2025" rel="noopener noreferrer"><?php echo esc_html__( 'Source', 'dabbuilds-child' ); ?></a>
+					</p>
+				</div>
 			</article>
-			<article class="dab-project-card">
-				<p class="dab-project-card__eyebrow">Profile</p>
-				<h2 class="dab-project-card__title">Resume 2026</h2>
-				<p class="dab-project-card__body">
-					<?php echo esc_html__( 'Resume 2026 V1. You can read it in the browser or download the Word file. This one actually matches what I have been doing lately.', 'dabbuilds-child' ); ?>
-				</p>
-				<p class="dab-project-card__links">
-					<a href="<?php echo esc_url( home_url( '/dabs-resume/' ) ); ?>"><?php echo esc_html__( 'View resume', 'dabbuilds-child' ); ?></a>
-				</p>
+			<article class="dab-project-row">
+				<span class="dab-catalog__index">003</span>
+				<div class="dab-project-row__body">
+					<p class="dab-project-card__eyebrow">Profile</p>
+					<h2 class="dab-project-card__title">Resume 2026</h2>
+					<p class="dab-project-card__body">
+						<?php echo esc_html__( 'Resume 2026 V1. You can read it in the browser or download the Word file. This one actually matches what I have been doing lately.', 'dabbuilds-child' ); ?>
+					</p>
+					<p class="dab-project-card__links">
+						<a href="<?php echo esc_url( home_url( '/dabs-resume/' ) ); ?>"><?php echo esc_html__( 'View resume', 'dabbuilds-child' ); ?></a>
+					</p>
+				</div>
 			</article>
 		</section>
 

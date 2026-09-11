@@ -1,41 +1,22 @@
 # Design language
 
-dabbuilds.com is styled as a **physical object whose finish and illumination change with the hour**, not as a launch-trailer HUD.
+dabbuilds.com is laid out as a **product catalog whose finish and illumination change with the hour**.
 
-The look is translated from industrial-design principles used by [Body Shop](https://www.body-shop.co/) (San Francisco — Calvin Lien, Joe Tsao, and collaborators) on objects such as 1X NEO Gamma, Dream Recorder, Quiet Hours, and Walden Time. This is **not** an affiliation, and we do not copy their photography, wordmark, or website.
+The look is translated from industrial-design principles used by [Body Shop](https://www.body-shop.co/) (San Francisco). This is **not** an affiliation, and we do not copy their photography, wordmark, or website.
 
-## Principles we kept
+## Principles
 
-1. **Restraint.** Receding chrome. No cyan glow, no grid overlay, no gradient wordmark.
-2. **Warm materials.** Bone paper, plaster, graphite, brass/bakelite accent. Day looks like a product on a table. Night looks like a nightstand object with a low wash.
-3. **Time as a product feature.** Walden Time and Quiet Hours mark the day without notifications. The site follows the viewer’s local clock in one-hour steps. See [lighting.md](./lighting.md).
-4. **Deference.** Auto lighting plus a labeled Auto / Day / Night control. No geolocation.
+1. **The object is the image.** Build-log entries lead with a full-width still. Chrome recedes.
+2. **Catalog, not cards.** Numbered entries (`001`), dates as `Y.m.d`, captions under the object. No rounded app tiles.
+3. **Type that is not a startup sans.** Display is Instrument Serif. UI and body are IBM Plex Sans.
+4. **Machined plates, not pills.** Primary actions are 2px-radius brass rectangles. Ghost actions are underlined stamps.
+5. **Lighting is a switch.** Auto / Day / Night stays in the catalog bar. See [lighting.md](./lighting.md).
 
 ## What did not change
 
-Copy, posts, the resume file, `/play/` (Wimbledon Pong), navigation labels, and URL structure. Only the object around them restyled.
+Copy, posts, the resume file, `/play/` (Wimbledon Pong), navigation labels, URL structure, and the lighting control.
 
 ## Type
 
-- Display / UI: [Manrope](https://fonts.google.com/specimen/Manrope)
-- Body: [Source Sans 3](https://fonts.google.com/specimen/Source+Sans+3)
-
-## Tokens
-
-CSS custom properties, applied by `custom/theme/dabbuilds-child/assets/lighting.js`:
-
-| Token | Role |
-|-------|------|
-| `--dab-ground` | Page field |
-| `--dab-panel` | Cards, article plate, header tools |
-| `--dab-ink` | Headings, primary text |
-| `--dab-muted` | Body copy |
-| `--dab-dim` | Captions, footer hint |
-| `--dab-accent` | Links, primary buttons, eyebrows |
-| `--dab-btn-fg` | Type on the primary button |
-| `--dab-line` / `--dab-line-strong` | Hairline seams |
-| `--dab-glow` | Nightstand wash (transparent by day) |
-| `--dab-elev` | Soft object shadow |
-| `--dab-luma` | 0–1 intensity, documentation / future use |
-
-Midday fallback lives on `:root`. Coarse night fallback lives on `html[data-dab-period="night"]` so the first paint is not a flash of the wrong period.
+- Display: [Instrument Serif](https://fonts.google.com/specimen/Instrument+Serif)
+- Body / UI / indexes: [IBM Plex Sans](https://fonts.google.com/specimen/IBM+Plex+Sans)

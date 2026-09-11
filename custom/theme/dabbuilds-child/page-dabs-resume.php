@@ -50,7 +50,7 @@ $file_name   = $resume_file ? wp_basename( $resume_file ) : 'resume';
 		<?php if ( $resume_file && $viewer_src ) : ?>
 			<section id="dab-resume-viewer" class="dab-resume__viewer-wrap" aria-label="<?php echo esc_attr__( 'Resume preview', 'dabbuilds-child' ); ?>">
 				<div class="dab-resume__viewer-chrome">
-					<span class="dab-resume__viewer-dot" aria-hidden="true"></span>
+					<span class="dab-catalog__index" aria-hidden="true">001</span>
 					<span class="dab-resume__viewer-label"><?php echo esc_html( $file_name ); ?></span>
 					<a
 						class="dab-resume__viewer-dl"

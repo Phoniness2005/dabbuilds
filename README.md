@@ -61,7 +61,7 @@ SFTP credentials: `.env.local` only (gitignored). Details: [`docs/deploy.md`](do
 
 ## Look and lighting
 
-The child theme treats the site as an object whose illumination follows the **viewer’s local clock** in one-hour steps (Auto / Day / Night override). Principles and tokens: [`docs/design-language.md`](docs/design-language.md). Drop-in guide for other WordPress sites: [`docs/lighting.md`](docs/lighting.md).
+The child theme is a **catalog object**: Instrument Serif nameplates, IBM Plex Sans UI, numbered build-log stills, and illumination that follows the **viewer’s local clock** in one-hour steps (Auto / Day / Night). Principles: [`docs/design-language.md`](docs/design-language.md). Lighting drop-in: [`docs/lighting.md`](docs/lighting.md).
 
 Debug a specific hour: `https://dabbuilds.com/?dab-hour=12` (midday) or `?dab-hour=22` (evening).
 

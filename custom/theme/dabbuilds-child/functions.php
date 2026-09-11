@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 function dabbuilds_child_enqueue_assets() {
 	wp_enqueue_style(
 		'dabbuilds-fonts',
-		'https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Source+Sans+3:ital,wght@0,400;0,500;0,600;1,400&display=swap',
+		'https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Instrument+Serif:ital@0;1&display=swap',
 		array(),
 		null
 	);
@@ -199,25 +199,27 @@ function dabbuilds_child_render_hero() {
 	?>
 	<section class="dab-hero" aria-label="<?php echo esc_attr__( 'Introduction', 'dabbuilds-child' ); ?>">
 		<div class="dab-hero__inner">
-			<p class="dab-hero__eyebrow">Build · Iterate · Launch</p>
-			<h1 class="dab-hero__title">
-				What can I help you<br>
-				<span class="dab-hero__accent">build?</span>
-			</h1>
-			<p class="dab-hero__lede">
-				Hardware, software, and the space between — a log of experiments,
-				vehicles, and code from someone who believes the future is still
-				worth shipping.
-			</p>
-			<div class="dab-hero__actions">
-				<a class="dab-btn dab-btn--primary" href="#dab-latest">Read the build log</a>
-				<a class="dab-btn dab-btn--ghost" href="<?php echo esc_url( home_url( '/dabs-resume/' ) ); ?>">Resume</a>
+			<div class="dab-hero__copy">
+				<p class="dab-hero__eyebrow">Build · Iterate · Launch</p>
+				<h1 class="dab-hero__title">
+					What can I help you<br>
+					<span class="dab-hero__accent">build?</span>
+				</h1>
+				<p class="dab-hero__lede">
+					Hardware, software, and the space between — a log of experiments,
+					vehicles, and code from someone who believes the future is still
+					worth shipping.
+				</p>
+				<div class="dab-hero__actions">
+					<a class="dab-btn dab-btn--primary" href="#dab-latest">Read the build log</a>
+					<a class="dab-btn dab-btn--ghost" href="<?php echo esc_url( home_url( '/dabs-resume/' ) ); ?>">Resume</a>
+				</div>
 			</div>
-			<ul class="dab-hero__signals" aria-label="<?php echo esc_attr__( 'Focus areas', 'dabbuilds-child' ); ?>">
-				<li>FPV &amp; flight systems</li>
-				<li>AI-assisted building</li>
-				<li>Open experiments</li>
-			</ul>
+			<ol class="dab-hero__signals" aria-label="<?php echo esc_attr__( 'Focus areas', 'dabbuilds-child' ); ?>">
+				<li><span class="dab-hero__index">01</span> FPV &amp; flight systems</li>
+				<li><span class="dab-hero__index">02</span> AI-assisted building</li>
+				<li><span class="dab-hero__index">03</span> Open experiments</li>
+			</ol>
 		</div>
 	</section>
 	<div id="dab-latest" class="dab-latest-anchor"></div>

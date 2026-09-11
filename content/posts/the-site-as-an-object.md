@@ -28,12 +28,6 @@ The file that matters for lighting is [`custom/theme/dabbuilds-child/assets/ligh
 
 You need the 24 palettes, a tiny boot script so the first paint is not the wrong period, the Auto / Day / Night buttons, and CSS that actually reads the variables. That is the whole trick.
 
-## I scanned the repo before I pushed
-
-This repo is public on purpose, so I went looking for things that should not be in it: passwords, application tokens, `.env.local`, personal email, the SFTP account. Those stay on the machine. The lighting script does not send your hour or timezone anywhere. The existing hardening plugin already tells the browser not to hand out geolocation.
-
-The resume download is still public, same as before, because that is the point of a resume page.
-
 ## Still iterating
 
 Pong is still Wimbledon green on purpose. The Nano Long Range is still in progress with my dad. I am sure I will notice a contrast bug at some odd hour the first time I open this on a phone in a dark room, the same way I found the Pong menu bugs by handing it to my wife.

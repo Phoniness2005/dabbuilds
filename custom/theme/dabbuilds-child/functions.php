@@ -198,13 +198,12 @@ function dabbuilds_child_render_hero() {
 	$printed = true;
 	?>
 	<section class="dab-hero" aria-label="<?php echo esc_attr__( 'Introduction', 'dabbuilds-child' ); ?>">
+		<p class="dab-hero__eyebrow">Build · Iterate · Launch</p>
+		<h1 class="dab-hero__title">
+			What can I help you <span class="dab-hero__accent">build?</span>
+		</h1>
 		<div class="dab-hero__inner">
 			<div class="dab-hero__copy">
-				<p class="dab-hero__eyebrow">Build · Iterate · Launch</p>
-				<h1 class="dab-hero__title">
-					What can I help you<br>
-					<span class="dab-hero__accent">build?</span>
-				</h1>
 				<p class="dab-hero__lede">
 					Hardware, software, and the space between — a log of experiments,
 					vehicles, and code from someone who believes the future is still

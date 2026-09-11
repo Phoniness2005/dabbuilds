@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 function dabbuilds_child_enqueue_assets() {
 	wp_enqueue_style(
 		'dabbuilds-fonts',
-		'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap',
+		'https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Source+Sans+3:ital,wght@0,400;0,500;0,600;1,400&display=swap',
 		array(),
 		null
 	);
@@ -54,7 +54,51 @@ function dabbuilds_child_enqueue_assets() {
 			true
 		);
 	}
+
+	$lighting_js = get_stylesheet_directory() . '/assets/lighting.js';
+	if ( file_exists( $lighting_js ) ) {
+		wp_enqueue_script(
+			'dabbuilds-lighting',
+			get_stylesheet_directory_uri() . '/assets/lighting.js',
+			array(),
+			(string) filemtime( $lighting_js ),
+			false
+		);
+	}
 }
+
+/**
+ * Coarse day/night class before lighting.js applies the hourly palette.
+ * Reads local hour and localStorage only — nothing is sent to the server.
+ */
+function dabbuilds_child_lighting_boot() {
+	?>
+	<script>
+	(function () {
+		try {
+			var mode = 'auto';
+			try { mode = localStorage.getItem('dab-light-mode') || 'auto'; } catch (e) {}
+			var hour = new Date().getHours();
+			try {
+				var q = new URLSearchParams(location.search).get('dab-hour');
+				if (q !== null && q !== '') hour = parseInt(q, 10);
+			} catch (e) {}
+			if (mode === 'day') hour = 12;
+			if (mode === 'night') hour = 22;
+			hour = ((hour % 24) + 24) % 24;
+			if (isNaN(hour)) hour = new Date().getHours();
+			var night = (hour < 6 || hour >= 19);
+			var el = document.documentElement;
+			el.dataset.dabMode = mode;
+			el.dataset.dabHour = String(hour);
+			el.dataset.dabPeriod = night ? 'night' : 'day';
+			el.style.colorScheme = night ? 'dark' : 'light';
+		} catch (e) {}
+	})();
+	</script>
+	<?php
+}
+add_action( 'wp_head', 'dabbuilds_child_lighting_boot', 0 );
 add_action( 'wp_enqueue_scripts', 'dabbuilds_child_enqueue_assets', 20 );
 
 /**
@@ -154,8 +198,6 @@ function dabbuilds_child_render_hero() {
 	$printed = true;
 	?>
 	<section class="dab-hero" aria-label="<?php echo esc_attr__( 'Introduction', 'dabbuilds-child' ); ?>">
-		<div class="dab-hero__grid" aria-hidden="true"></div>
-		<div class="dab-hero__glow" aria-hidden="true"></div>
 		<div class="dab-hero__inner">
 			<p class="dab-hero__eyebrow">Build · Iterate · Launch</p>
 			<h1 class="dab-hero__title">

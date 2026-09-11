@@ -39,3 +39,7 @@ GitHub: Phoniness2005/dabbuilds
 - REST API available at `/wp-json/`
 - Elementor-related namespaces present (Elementor hosting / Elementor One)
 - Recent content themes: builds, FPV / Nano Long Range, Grok + Replit experiments
+
+## Lighting (client-only)
+
+Hourly palettes live in the child theme (`assets/lighting.js`). The browser reads local time and `localStorage`; the server never sees the hour. See [`lighting.md`](./lighting.md).

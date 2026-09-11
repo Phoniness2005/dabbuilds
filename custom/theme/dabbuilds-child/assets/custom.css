@@ -63,7 +63,7 @@ html[data-dab-period="night"] {
 html {
   scroll-behavior: smooth;
   color-scheme: light;
-  background: var(--dab-ground);
+  background: var(--dab-ground) !important;
 }
 
 html[data-dab-period="night"] {
@@ -72,7 +72,7 @@ html[data-dab-period="night"] {
 
 body {
   margin: 0;
-  background: var(--dab-ground);
+  background: var(--dab-ground) !important;
   color: var(--dab-ink);
   font-family: var(--dab-font-body);
   font-size: 17.5px;
@@ -195,11 +195,11 @@ body.dab-scrolled .site-header {
   flex: 1 1 auto;
 }
 
-.site-title {
+.site-header .site-title {
   margin: 0;
-  font-size: 0.92rem;
+  font-size: 0.95rem;
   font-weight: 700;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
 }
 
@@ -338,6 +338,10 @@ body.dab-nav-open .dab-nav-toggle__bar:nth-child(3) {
 }
 
 @media (max-width: 860px) {
+  .site-header .site-title {
+    font-size: 0.82rem;
+  }
+
   .site-description {
     display: none;
   }
@@ -438,10 +442,11 @@ body.dab-nav-open .dab-nav-toggle__bar:nth-child(3) {
 
 .dab-hero__lede {
   margin: 0 0 2rem;
-  max-width: 38rem;
+  max-width: min(38rem, 100%);
   font-size: clamp(1.05rem, 2.2vw, 1.2rem);
   line-height: 1.6;
   color: var(--dab-muted);
+  overflow-wrap: break-word;
 }
 
 .dab-hero__actions {
@@ -546,12 +551,12 @@ body.dab-nav-open .dab-nav-toggle__bar:nth-child(3) {
 
 body.home .dab-hero,
 body.blog .dab-hero {
-  width: 100vw;
-  max-width: 100vw;
-  margin-left: calc(50% - 50vw);
-  margin-right: calc(50% - 50vw);
-  padding-left: clamp(1.25rem, 4vw, 2.5rem);
-  padding-right: clamp(1.25rem, 4vw, 2.5rem);
+  width: auto;
+  max-width: none;
+  margin-left: 0;
+  margin-right: 0;
+  padding-left: 0;
+  padding-right: 0;
   box-sizing: border-box;
 }
 

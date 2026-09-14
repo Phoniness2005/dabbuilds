@@ -35,7 +35,7 @@ function dabbuilds_child_enqueue_assets() {
 	);
 
 	// Cache-bust when SFTP mtime does not advance (Cloudflare caches ?ver=).
-	$dab_asset_ver = '20260914-product-still-2';
+	$dab_asset_ver = '20260914-product-still-layout-1';
 	$custom_css = get_stylesheet_directory() . '/assets/custom.css';
 	if ( file_exists( $custom_css ) ) {
 		wp_enqueue_style(
@@ -190,7 +190,8 @@ function dabbuilds_child_get_resume_file_url() {
 }
 
 /**
- * Home hero markup (safe to call once per request).
+ * Home hero markup — Product Still (copy left + artifact stage + pillars).
+ * Safe to call once per request.
  */
 function dabbuilds_child_render_hero() {
 	static $printed = false;
@@ -198,14 +199,20 @@ function dabbuilds_child_render_hero() {
 		return;
 	}
 	$printed = true;
+
+	// Optional media library still (no invented remote URLs). Falls back to CSS stage.
+	$still_url = dabbuilds_child_shot_url( 'nano-long-range' );
+	if ( ! $still_url ) {
+		$still_url = dabbuilds_child_shot_url( 'nano-lr' );
+	}
 	?>
 	<section class="dab-hero" aria-label="<?php echo esc_attr__( 'Introduction', 'dabbuilds-child' ); ?>">
-		<p class="dab-hero__eyebrow">Build · Iterate · Launch</p>
-		<h1 class="dab-hero__title">
-			What can I help you <span class="dab-hero__accent">build?</span>
-		</h1>
 		<div class="dab-hero__inner">
 			<div class="dab-hero__copy">
+				<p class="dab-hero__eyebrow">Build · Iterate · Launch</p>
+				<h1 class="dab-hero__title">
+					What can I help you <span class="dab-hero__accent">build?</span>
+				</h1>
 				<p class="dab-hero__lede">
 					Hardware, software, and the space between — a log of experiments,
 					vehicles, and code from someone who believes the future is still
@@ -216,14 +223,71 @@ function dabbuilds_child_render_hero() {
 					<a class="dab-btn dab-btn--ghost" href="<?php echo esc_url( home_url( '/dabs-resume/' ) ); ?>">Resume</a>
 				</div>
 			</div>
-			<ol class="dab-hero__signals" aria-label="<?php echo esc_attr__( 'Focus areas', 'dabbuilds-child' ); ?>">
-				<li><span class="dab-hero__index">01</span> FPV &amp; flight systems</li>
-				<li><span class="dab-hero__index">02</span> AI-assisted building</li>
-				<li><span class="dab-hero__index">03</span> Open experiments</li>
-			</ol>
+			<aside class="dab-hero__artifact" aria-label="<?php echo esc_attr__( 'Featured artifact still', 'dabbuilds-child' ); ?>">
+				<?php if ( $still_url ) : ?>
+					<img
+						class="dab-hero__artifact-img"
+						src="<?php echo esc_url( $still_url ); ?>"
+						alt="<?php echo esc_attr__( 'Nano LR still', 'dabbuilds-child' ); ?>"
+						loading="eager"
+						decoding="async"
+					/>
+				<?php else : ?>
+					<div class="dab-hero__artifact-core" aria-hidden="true"></div>
+				<?php endif; ?>
+				<div class="dab-hero__artifact-meta">Nano LR · still</div>
+			</aside>
+		</div>
+		<div class="dab-pillars" role="list">
+			<div class="dab-pillar" role="listitem">
+				<div class="dab-pillar__num">01</div>
+				<p class="dab-pillar__label">FPV &amp; flight systems</p>
+			</div>
+			<div class="dab-pillar" role="listitem">
+				<div class="dab-pillar__num">02</div>
+				<p class="dab-pillar__label">AI-assisted building</p>
+			</div>
+			<div class="dab-pillar" role="listitem">
+				<div class="dab-pillar__num">03</div>
+				<p class="dab-pillar__label">Open experiments</p>
+			</div>
 		</div>
 	</section>
 	<div id="dab-latest" class="dab-latest-anchor"></div>
+	<?php
+}
+
+/**
+ * Hire-ready strip on the blog index (after hero, before build log).
+ * Safe to call once per request.
+ */
+function dabbuilds_child_render_hire_strip() {
+	static $printed = false;
+	if ( $printed || ! dabbuilds_child_is_blog_index() ) {
+		return;
+	}
+	$printed = true;
+	?>
+	<section class="dab-hire" id="dab-hire" aria-label="<?php echo esc_attr__( 'Hire-ready profile', 'dabbuilds-child' ); ?>">
+		<div class="dab-hire__inner">
+			<div class="dab-hire__copy">
+				<p class="dab-hire__kicker"><?php echo esc_html__( 'Available for hire', 'dabbuilds-child' ); ?></p>
+				<p>
+					<strong>Daniel Bryant</strong> — production / IT / ops background and maker of flight hardware,
+					shop systems, and the software that keeps them honest.
+					Proof lives in the build log below: frames flown, sites shipped, tools iterated in public.
+				</p>
+				<p class="dab-hire__mail">
+					<a href="mailto:daniel@dabbuilds.com"><?php echo esc_html( 'daniel@dabbuilds.com' ); ?></a>
+					<span aria-hidden="true"> · </span>
+					<a href="mailto:jobs@dabbuilds.com"><?php echo esc_html( 'jobs@dabbuilds.com' ); ?></a>
+				</p>
+			</div>
+			<a class="dab-btn dab-btn--primary" href="<?php echo esc_url( home_url( '/dabs-resume/' ) ); ?>">
+				<?php echo esc_html__( 'View resume', 'dabbuilds-child' ); ?>
+			</a>
+		</div>
+	</section>
 	<?php
 }
 

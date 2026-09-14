@@ -124,3 +124,40 @@ No database or Elementor template rollback required for this CSS-only change.
 - `mkdir` “Failure” lines during deploy are expected when remote directories already exist; file `put` operations completed.
 - **Follow-up:** `lighting.js` hourly palettes rewritten so Auto stays Product Still dark void (cream only when Day is locked). Redeployed via SFTP.
 - **Cache fix:** Cloudflare was pinning cream `custom.css` via stale `?ver=` filemtime. `functions.php` now uses `$dab_asset_ver = 20260914-product-still-2` for CSS/JS enqueue.
+
+---
+
+## Layout ship — Product Still full markup (2026-09-14)
+
+**Status:** Theme PHP + CSS on disk (parent deploys; no SFTP/git push from this step).  
+**Cache bust:** `$dab_asset_ver = '20260914-product-still-layout-1'` in `functions.php`.
+
+### What changed
+
+| Path | Change |
+|---|---|
+| `custom/theme/dabbuilds-child/functions.php` | Hero rebuilt as Product Still grid: `.dab-hero__copy` (eyebrow / title / lede / CTAs) + `.dab-hero__artifact` (optional `dabbuilds_child_shot_url` still, else CSS `.dab-hero__artifact-core` + meta `Nano LR · still`). Pillars `01/02/03` moved to `.dab-pillars` after inner. New `dabbuilds_child_render_hire_strip()` (Available for hire · production/IT/ops + maker · `/dabs-resume/` · mailto daniel@ + jobs@). Asset ver bumped. |
+| `custom/theme/dabbuilds-child/template-parts/archive.php` | Hire strip after hero; catalog → `.dab-ledger` with heading “Build log”; rows are single-link `.dab-ledger__row` (serial · title · date); excerpts removed; thumbnails kept in markup but hidden on home via CSS. |
+| `custom/theme/dabbuilds-child/assets/custom.css` | Styles for artifact stage, pillars strip, hire strip, ledger rows; responsive stack (artifact first on small screens; ledger 2-row mobile); no cyan; Instrument Serif + IBM Plex tokens kept; `lighting.js` Auto dark behavior untouched. |
+
+### Markup sketch (home)
+
+1. `.dab-hero` → `.dab-hero__inner` (copy \| artifact) → `.dab-pillars` → `#dab-latest`
+2. `.dab-hire` (blog index only)
+3. `.dab-ledger` → `.dab-ledger__row` × N
+
+### Deploy (parent)
+
+```bash
+./scripts/deploy-sftp.sh --yes --theme-only
+```
+
+Hard-refresh after deploy so Cloudflare picks up `?ver=20260914-product-still-layout-1`.
+
+### Verify
+
+1. Home Night/Auto: oversized artifact stage (CSS orb or media still), quiet copy left, pillars under hero.
+2. Hire strip visible before build log; resume CTA + mailto work.
+3. Build log = calm list (serial · title · date), no excerpts, no dense table chrome.
+4. Mobile ≤820px: artifact above copy; pillars stack; ledger serial/date then title.
+5. Day/Night toggle still driven by `lighting.js`.

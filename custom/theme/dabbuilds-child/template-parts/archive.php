@@ -1,6 +1,6 @@
 <?php
 /**
- * Catalog index of the build log.
+ * Catalog index of the build log — Apple-style ledger rows.
  *
  * @package dabbuilds-child
  */
@@ -19,39 +19,44 @@ $per   = max( 1, (int) $wp_query->get( 'posts_per_page' ) );
 	if ( function_exists( 'dabbuilds_child_render_hero' ) ) {
 		dabbuilds_child_render_hero();
 	}
+
+	if ( function_exists( 'dabbuilds_child_render_hire_strip' ) ) {
+		dabbuilds_child_render_hire_strip();
+	}
 	?>
 
-	<div class="page-content dab-catalog">
-		<?php
-		while ( have_posts() ) {
-			the_post();
-			$post_link = get_permalink();
-			$index     = ( $paged - 1 ) * $per + (int) $wp_query->current_post + 1;
-			$num       = str_pad( (string) $index, 3, '0', STR_PAD_LEFT );
-			?>
-			<article <?php post_class( 'post dab-catalog__item' ); ?>>
-				<?php if ( has_post_thumbnail() ) : ?>
-					<a class="dab-catalog__figure" href="<?php echo esc_url( $post_link ); ?>">
-						<?php the_post_thumbnail( 'large' ); ?>
-					</a>
-				<?php endif; ?>
-				<div class="dab-catalog__caption">
-					<div class="dab-catalog__meta">
-						<span class="dab-catalog__index"><?php echo esc_html( $num ); ?></span>
-						<time class="dab-catalog__date" datetime="<?php echo esc_attr( get_the_date( DATE_W3C ) ); ?>">
-							<?php echo esc_html( get_the_date( 'Y.m.d' ) ); ?>
-						</time>
-					</div>
-					<h2 class="entry-title">
-						<a href="<?php echo esc_url( $post_link ); ?>"><?php echo wp_kses_post( get_the_title() ); ?></a>
-					</h2>
-					<?php the_excerpt(); ?>
-				</div>
-			</article>
+	<section class="dab-ledger page-content dab-catalog" aria-label="<?php echo esc_attr__( 'Build log', 'dabbuilds-child' ); ?>">
+		<h2 class="dab-ledger__heading"><?php echo esc_html__( 'Build log', 'dabbuilds-child' ); ?></h2>
+
+		<div class="dab-ledger__list" role="list">
 			<?php
-		}
-		?>
-	</div>
+			while ( have_posts() ) {
+				the_post();
+				$post_link = get_permalink();
+				$index     = ( $paged - 1 ) * $per + (int) $wp_query->current_post + 1;
+				$num       = str_pad( (string) $index, 3, '0', STR_PAD_LEFT );
+				?>
+				<a
+					class="dab-ledger__row dab-catalog__item"
+					role="listitem"
+					href="<?php echo esc_url( $post_link ); ?>"
+				>
+					<?php if ( has_post_thumbnail() ) : ?>
+						<span class="dab-ledger__figure dab-catalog__figure" aria-hidden="true">
+							<?php the_post_thumbnail( 'thumbnail' ); ?>
+						</span>
+					<?php endif; ?>
+					<span class="dab-ledger__serial dab-catalog__index"><?php echo esc_html( $num ); ?></span>
+					<span class="dab-ledger__title"><?php echo wp_kses_post( get_the_title() ); ?></span>
+					<time class="dab-ledger__date dab-catalog__date" datetime="<?php echo esc_attr( get_the_date( DATE_W3C ) ); ?>">
+						<?php echo esc_html( get_the_date( 'Y.m.d' ) ); ?>
+					</time>
+				</a>
+				<?php
+			}
+			?>
+		</div>
+	</section>
 
 	<?php
 	if ( $wp_query->max_num_pages > 1 ) :

@@ -61,13 +61,15 @@ SFTP credentials: `.env.local` only (gitignored). Details: [`docs/deploy.md`](do
 
 ## Look and lighting
 
-The child theme is a **catalog object**: Instrument Serif nameplates, IBM Plex Sans UI, numbered build-log stills, and illumination that follows the **viewer’s local clock** in one-hour steps (Auto / Day / Night). Principles: [`docs/design-language.md`](docs/design-language.md). Lighting drop-in: [`docs/lighting.md`](docs/lighting.md).
+The child theme is a **Product Still on a dark void**: Instrument Serif nameplates, IBM Plex Sans UI, quiet hero with an oversized artifact stage, calm Apple-style build-log rows, and amber `#F5A524` accents only (no cyan). Illumination still follows the **viewer’s local clock** (Auto / Day / Night); Night is the stronger Product Still look, Day shifts to cooler charcoal/cream. Principles: [`docs/design-language.md`](docs/design-language.md). Lighting drop-in: [`docs/lighting.md`](docs/lighting.md). Go-live notes: [`docs/changes/2026-09-14-product-still-redesign.md`](docs/changes/2026-09-14-product-still-redesign.md).
 
 Debug a specific hour: `https://dabbuilds.com/?dab-hour=12` (midday) or `?dab-hour=22` (evening).
+
 
 ## Status
 
 **Phase 1 — established:** repo, docs, folders for custom code.  
 **Phase 2 — connected:** SFTP to Elementor Cloud (`/html`), child theme scaffold, deploy scripts.  
 **Phase 3 — iterate:** child theme, `/play/`, resume hosting, and the `dabbuilds-hardening` plugin are live. This repo is public.  
-**Phase 4 — object lighting:** Body Shop-derived materials, 24 hourly palettes, documented for reuse.
+**Phase 4 — object lighting:** hourly Auto / Day / Night via `lighting.js`, documented for reuse.  
+**Phase 5 — Product Still (2026-09-14):** dark void/panel frame, amber-only accents, quiet Product Still hero, calmed build list; theme CSS go-live via `--theme-only` deploy.

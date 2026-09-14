@@ -116,3 +116,9 @@ No database or Elementor template rollback required for this CSS-only change.
 - Replacing Instrument Serif with Inter (prototype used system Inter; live keeps Instrument Serif + IBM Plex per brand)
 - WebGL / heavy motion
 - Cyan or multi-accent experiments
+
+## Deploy log (live)
+
+- **2026-09-14 ~14:30 CT** — SFTP theme deploy to Elementor Cloud (`./scripts/deploy-sftp.sh --yes --theme-only`) as user `KaJMoEBi@sftp.elementor.cloud:32022`.
+- Confirmed live CSS serves Product Still tokens (`#0A0A0B` / `#F5A524`) at `https://dabbuilds.com/wp-content/themes/dabbuilds-child/assets/custom.css` (cache-busted fetch).
+- `mkdir` “Failure” lines during deploy are expected when remote directories already exist; file `put` operations completed.

@@ -123,3 +123,4 @@ No database or Elementor template rollback required for this CSS-only change.
 - Confirmed live CSS serves Product Still tokens (`#0A0A0B` / `#F5A524`) at `https://dabbuilds.com/wp-content/themes/dabbuilds-child/assets/custom.css` (cache-busted fetch).
 - `mkdir` “Failure” lines during deploy are expected when remote directories already exist; file `put` operations completed.
 - **Follow-up:** `lighting.js` hourly palettes rewritten so Auto stays Product Still dark void (cream only when Day is locked). Redeployed via SFTP.
+- **Cache fix:** Cloudflare was pinning cream `custom.css` via stale `?ver=` filemtime. `functions.php` now uses `$dab_asset_ver = 20260914-product-still-2` for CSS/JS enqueue.

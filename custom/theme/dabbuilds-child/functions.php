@@ -34,13 +34,15 @@ function dabbuilds_child_enqueue_assets() {
 		wp_get_theme()->get( 'Version' )
 	);
 
+	// Cache-bust when SFTP mtime does not advance (Cloudflare caches ?ver=).
+	$dab_asset_ver = '20260914-product-still-2';
 	$custom_css = get_stylesheet_directory() . '/assets/custom.css';
 	if ( file_exists( $custom_css ) ) {
 		wp_enqueue_style(
 			'dabbuilds-custom',
 			get_stylesheet_directory_uri() . '/assets/custom.css',
 			array( 'dabbuilds-child' ),
-			(string) filemtime( $custom_css )
+			$dab_asset_ver
 		);
 	}
 
@@ -50,7 +52,7 @@ function dabbuilds_child_enqueue_assets() {
 			'dabbuilds-custom',
 			get_stylesheet_directory_uri() . '/assets/custom.js',
 			array(),
-			(string) filemtime( $custom_js ),
+			$dab_asset_ver,
 			true
 		);
 	}
@@ -61,7 +63,7 @@ function dabbuilds_child_enqueue_assets() {
 			'dabbuilds-lighting',
 			get_stylesheet_directory_uri() . '/assets/lighting.js',
 			array(),
-			(string) filemtime( $lighting_js ),
+			$dab_asset_ver,
 			false
 		);
 	}

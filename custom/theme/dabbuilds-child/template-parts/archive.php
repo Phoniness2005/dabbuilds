@@ -1,6 +1,6 @@
 <?php
 /**
- * Catalog index of the build log — Apple-style ledger rows.
+ * Catalog index of the build log — clear serial / title / date rows.
  *
  * @package dabbuilds-child
  */
@@ -19,14 +19,11 @@ $per   = max( 1, (int) $wp_query->get( 'posts_per_page' ) );
 	if ( function_exists( 'dabbuilds_child_render_hero' ) ) {
 		dabbuilds_child_render_hero();
 	}
-
-	if ( function_exists( 'dabbuilds_child_render_hire_strip' ) ) {
-		dabbuilds_child_render_hire_strip();
-	}
 	?>
 
 	<section class="dab-ledger page-content dab-catalog" aria-label="<?php echo esc_attr__( 'Build log', 'dabbuilds-child' ); ?>">
 		<h2 class="dab-ledger__heading"><?php echo esc_html__( 'Build log', 'dabbuilds-child' ); ?></h2>
+		<p class="dab-ledger__lede"><?php echo esc_html__( 'Newest first. Open any entry for the full write-up.', 'dabbuilds-child' ); ?></p>
 
 		<div class="dab-ledger__list" role="list">
 			<?php
@@ -41,11 +38,6 @@ $per   = max( 1, (int) $wp_query->get( 'posts_per_page' ) );
 					role="listitem"
 					href="<?php echo esc_url( $post_link ); ?>"
 				>
-					<?php if ( has_post_thumbnail() ) : ?>
-						<span class="dab-ledger__figure dab-catalog__figure" aria-hidden="true">
-							<?php the_post_thumbnail( 'thumbnail' ); ?>
-						</span>
-					<?php endif; ?>
 					<span class="dab-ledger__serial dab-catalog__index"><?php echo esc_html( $num ); ?></span>
 					<span class="dab-ledger__title"><?php echo wp_kses_post( get_the_title() ); ?></span>
 					<time class="dab-ledger__date dab-catalog__date" datetime="<?php echo esc_attr( get_the_date( DATE_W3C ) ); ?>">
@@ -59,6 +51,10 @@ $per   = max( 1, (int) $wp_query->get( 'posts_per_page' ) );
 	</section>
 
 	<?php
+	if ( function_exists( 'dabbuilds_child_render_hire_strip' ) ) {
+		dabbuilds_child_render_hire_strip();
+	}
+
 	if ( $wp_query->max_num_pages > 1 ) :
 		$prev_arrow = is_rtl() ? '&rarr;' : '&larr;';
 		$next_arrow = is_rtl() ? '&larr;' : '&rarr;';

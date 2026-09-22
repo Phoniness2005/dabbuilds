@@ -504,6 +504,17 @@ body.page .page-content,
   z-index: 0;
 }
 
+.dab-hero__artifact-link {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: clamp(320px, 48vw, 520px);
+  text-decoration: none;
+  color: inherit;
+}
+
 .dab-hero__artifact-img {
   position: relative;
   z-index: 1;
@@ -511,7 +522,9 @@ body.page .page-content,
   height: 100%;
   min-height: clamp(320px, 48vw, 520px);
   object-fit: cover;
+  object-position: center 35%;
   border-radius: 0;
+  display: block;
 }
 
 .dab-hero__artifact-core {
@@ -549,7 +562,33 @@ body.page .page-content,
   letter-spacing: 0.08em;
   color: var(--dab-muted);
   text-transform: uppercase;
-  opacity: 0.7;
+  opacity: 0.85;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+}
+
+.dab-hero__artifact-meta:hover {
+  color: var(--dab-ink);
+  border-bottom-color: var(--dab-muted);
+  opacity: 1;
+}
+
+/* Single focus line — replaces the three numbered pillars for clearer scanning */
+.dab-focus {
+  position: relative;
+  z-index: 1;
+  max-width: var(--dab-max);
+  margin: 0 auto;
+  padding: 1.1rem clamp(1.25rem, 4vw, 3.5rem);
+  box-sizing: border-box;
+  border-top: 1px solid var(--dab-line);
+  border-bottom: 1px solid var(--dab-line);
+  font-family: var(--dab-font-index);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--dab-muted);
+  text-align: center;
 }
 
 /* Capability pillars — moved out of hero side list */
@@ -1526,5 +1565,57 @@ textarea:focus {
   .dab-resume__frame {
     min-height: 70vh;
     height: 70vh;
+  }
+}
+
+
+/* Compact hire strip — after build log, less visual weight */
+.dab-hire--compact {
+  padding-top: 2rem;
+  padding-bottom: 2.5rem;
+  border-top: 1px solid var(--dab-line);
+}
+
+.dab-hire--compact .dab-hire__inner {
+  gap: 1.25rem;
+  align-items: center;
+}
+
+.dab-hire--compact .dab-hire__copy p {
+  margin: 0.35rem 0 0;
+  max-width: 42rem;
+}
+
+.dab-ledger__lede {
+  max-width: var(--dab-max);
+  margin: -0.5rem auto 1.5rem;
+  padding: 0 clamp(1.25rem, 4vw, 3.5rem);
+  box-sizing: border-box;
+  color: var(--dab-muted);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+/* Uniform ledger rows — no mixed thumbnails */
+.dab-ledger__row {
+  display: grid;
+  grid-template-columns: 3.5rem 1fr auto;
+  gap: 1rem;
+  align-items: baseline;
+}
+
+@media (max-width: 640px) {
+  .dab-focus {
+    letter-spacing: 0.04em;
+    font-size: 0.6875rem;
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
+  .dab-ledger__row {
+    grid-template-columns: 2.75rem 1fr;
+    grid-template-rows: auto auto;
+  }
+  .dab-ledger__date {
+    grid-column: 2;
   }
 }

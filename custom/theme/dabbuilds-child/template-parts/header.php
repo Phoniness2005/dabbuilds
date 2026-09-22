@@ -44,7 +44,7 @@ $projects_url = home_url( '/projects/' );
 			<ul class="dab-nav__list">
 				<li class="dab-nav__item<?php echo is_front_page() || is_home() ? ' is-active' : ''; ?>">
 					<a class="dab-nav__link" href="<?php echo esc_url( $home_url ); ?>">
-						<?php echo esc_html__( 'Build log', 'dabbuilds-child' ); ?>
+						<?php echo esc_html__( 'Home', 'dabbuilds-child' ); ?>
 					</a>
 				</li>
 				<li class="dab-nav__item<?php echo is_page( 'projects' ) ? ' is-active' : ''; ?>">

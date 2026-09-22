@@ -35,7 +35,7 @@ function dabbuilds_child_enqueue_assets() {
 	);
 
 	// Cache-bust when SFTP mtime does not advance (Cloudflare caches ?ver=).
-	$dab_asset_ver = '20260914-product-still-layout-1';
+	$dab_asset_ver = '20260922-home-clarity-1';
 	$custom_css = get_stylesheet_directory() . '/assets/custom.css';
 	if ( file_exists( $custom_css ) ) {
 		wp_enqueue_style(
@@ -200,11 +200,15 @@ function dabbuilds_child_render_hero() {
 	}
 	$printed = true;
 
-	// Optional media library still (no invented remote URLs). Falls back to CSS stage.
+	// Media library still if present; else theme-bundled Nano LR photo.
 	$still_url = dabbuilds_child_shot_url( 'nano-long-range' );
 	if ( ! $still_url ) {
 		$still_url = dabbuilds_child_shot_url( 'nano-lr' );
 	}
+	if ( ! $still_url ) {
+		$still_url = dabbuilds_child_theme_still_url( 'nano-lr-still.jpg' );
+	}
+	$nano_url = home_url( '/nano-long-range-v1-update/' );
 	?>
 	<section class="dab-hero" aria-label="<?php echo esc_attr__( 'Introduction', 'dabbuilds-child' ); ?>">
 		<div class="dab-hero__inner">
@@ -214,44 +218,34 @@ function dabbuilds_child_render_hero() {
 					What can I help you <span class="dab-hero__accent">build?</span>
 				</h1>
 				<p class="dab-hero__lede">
-					Hardware, software, and the space between — a log of experiments,
-					vehicles, and code from someone who believes the future is still
-					worth shipping.
+					Hardware, software, and the space between — experiments, vehicles,
+					and code from someone who believes the future is still worth shipping.
 				</p>
 				<div class="dab-hero__actions">
-					<a class="dab-btn dab-btn--primary" href="#dab-latest">Read the build log</a>
-					<a class="dab-btn dab-btn--ghost" href="<?php echo esc_url( home_url( '/dabs-resume/' ) ); ?>">Resume</a>
+					<a class="dab-btn dab-btn--primary" href="#dab-latest"><?php echo esc_html__( 'Build log', 'dabbuilds-child' ); ?></a>
+					<a class="dab-btn dab-btn--ghost" href="<?php echo esc_url( home_url( '/projects/' ) ); ?>"><?php echo esc_html__( 'Projects', 'dabbuilds-child' ); ?></a>
 				</div>
 			</div>
-			<aside class="dab-hero__artifact" aria-label="<?php echo esc_attr__( 'Featured artifact still', 'dabbuilds-child' ); ?>">
+			<aside class="dab-hero__artifact" aria-label="<?php echo esc_attr__( 'Nano Long Range drone', 'dabbuilds-child' ); ?>">
 				<?php if ( $still_url ) : ?>
-					<img
-						class="dab-hero__artifact-img"
-						src="<?php echo esc_url( $still_url ); ?>"
-						alt="<?php echo esc_attr__( 'Nano LR still', 'dabbuilds-child' ); ?>"
-						loading="eager"
-						decoding="async"
-					/>
+					<a class="dab-hero__artifact-link" href="<?php echo esc_url( $nano_url ); ?>">
+						<img
+							class="dab-hero__artifact-img"
+							src="<?php echo esc_url( $still_url ); ?>"
+							alt="<?php echo esc_attr__( 'Nano Long Range V1 drone, fresh off the printer', 'dabbuilds-child' ); ?>"
+							loading="eager"
+							decoding="async"
+							width="768"
+							height="1024"
+						/>
+					</a>
 				<?php else : ?>
 					<div class="dab-hero__artifact-core" aria-hidden="true"></div>
 				<?php endif; ?>
-				<div class="dab-hero__artifact-meta">Nano LR · still</div>
+				<a class="dab-hero__artifact-meta" href="<?php echo esc_url( $nano_url ); ?>">Nano LR · build log</a>
 			</aside>
 		</div>
-		<div class="dab-pillars" role="list">
-			<div class="dab-pillar" role="listitem">
-				<div class="dab-pillar__num">01</div>
-				<p class="dab-pillar__label">FPV &amp; flight systems</p>
-			</div>
-			<div class="dab-pillar" role="listitem">
-				<div class="dab-pillar__num">02</div>
-				<p class="dab-pillar__label">AI-assisted building</p>
-			</div>
-			<div class="dab-pillar" role="listitem">
-				<div class="dab-pillar__num">03</div>
-				<p class="dab-pillar__label">Open experiments</p>
-			</div>
-		</div>
+		<p class="dab-focus">FPV &amp; flight systems · AI-assisted building · open experiments</p>
 	</section>
 	<div id="dab-latest" class="dab-latest-anchor"></div>
 	<?php
@@ -268,14 +262,12 @@ function dabbuilds_child_render_hire_strip() {
 	}
 	$printed = true;
 	?>
-	<section class="dab-hire" id="dab-hire" aria-label="<?php echo esc_attr__( 'Hire-ready profile', 'dabbuilds-child' ); ?>">
+	<section class="dab-hire dab-hire--compact" id="dab-hire" aria-label="<?php echo esc_attr__( 'Contact', 'dabbuilds-child' ); ?>">
 		<div class="dab-hire__inner">
 			<div class="dab-hire__copy">
 				<p class="dab-hire__kicker"><?php echo esc_html__( 'Available for hire', 'dabbuilds-child' ); ?></p>
 				<p>
-					<strong>Daniel Bryant</strong> — production / IT / ops background and maker of flight hardware,
-					shop systems, and the software that keeps them honest.
-					Proof lives in the build log below: frames flown, sites shipped, tools iterated in public.
+					<strong>Daniel Bryant</strong> — production / IT / ops, flight hardware, and shop software.
 				</p>
 				<p class="dab-hire__mail">
 					<a href="mailto:daniel@dabbuilds.com"><?php echo esc_html( 'daniel@dabbuilds.com' ); ?></a>
@@ -283,8 +275,8 @@ function dabbuilds_child_render_hire_strip() {
 					<a href="mailto:jobs@dabbuilds.com"><?php echo esc_html( 'jobs@dabbuilds.com' ); ?></a>
 				</p>
 			</div>
-			<a class="dab-btn dab-btn--primary" href="<?php echo esc_url( home_url( '/dabs-resume/' ) ); ?>">
-				<?php echo esc_html__( 'View resume', 'dabbuilds-child' ); ?>
+			<a class="dab-btn dab-btn--ghost" href="<?php echo esc_url( home_url( '/dabs-resume/' ) ); ?>">
+				<?php echo esc_html__( 'Resume', 'dabbuilds-child' ); ?>
 			</a>
 		</div>
 	</section>
@@ -345,6 +337,24 @@ function dabbuilds_child_force_templates( $template ) {
 	return $template;
 }
 add_filter( 'template_include', 'dabbuilds_child_force_templates', 99 );
+
+/**
+ * Theme-bundled still URL (ships with the child theme; no media-library dependency).
+ *
+ * @param string $file Filename under assets/stills/.
+ * @return string Empty if missing.
+ */
+function dabbuilds_child_theme_still_url( $file = 'nano-lr-still.jpg' ) {
+	$file = basename( (string) $file );
+	if ( '' === $file || false !== strpos( $file, '..' ) ) {
+		return '';
+	}
+	$path = get_stylesheet_directory() . '/assets/stills/' . $file;
+	if ( ! is_readable( $path ) ) {
+		return '';
+	}
+	return get_stylesheet_directory_uri() . '/assets/stills/' . rawurlencode( $file );
+}
 
 /**
  * Public URL of an uploaded screenshot by attachment slug.

@@ -15,7 +15,7 @@ get_header();
 
 $resume_file = dabbuilds_child_get_resume_file_url();
 $viewer_src  = $resume_file
-	? 'https://view.officeapps.live.com/op/embed.aspx?src=' . rawurlencode( $resume_file )
+	? 'https://view.officeapps.live.com/op/embed.aspx?src=' . rawurlencode( $resume_file . ( str_contains( $resume_file, '?' ) ? '&' : '?' ) . 'v=20260922-jobs' )
 	: '';
 $file_name   = $resume_file ? wp_basename( $resume_file ) : 'resume';
 ?>

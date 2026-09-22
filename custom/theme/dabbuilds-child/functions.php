@@ -137,9 +137,9 @@ function dabbuilds_child_is_blog_index() {
  * @return string Empty if not found.
  */
 function dabbuilds_child_get_resume_file_url() {
-	$known = home_url( '/wp-content/uploads/2026/08/Resume-2026-V1.doc' );
+	$known = home_url( '/wp-content/uploads/2026/08/Resume-2026-V2.doc' );
 
-	$cached = get_transient( 'dabbuilds_resume_file_url_v2' );
+	$cached = get_transient( 'dabbuilds_resume_file_url_v3' );
 	if ( is_string( $cached ) && $cached !== '' ) {
 		return $cached;
 	}
@@ -183,7 +183,7 @@ function dabbuilds_child_get_resume_file_url() {
 	}
 
 	if ( $url ) {
-		set_transient( 'dabbuilds_resume_file_url_v2', $url, HOUR_IN_SECONDS );
+		set_transient( 'dabbuilds_resume_file_url_v3', $url, HOUR_IN_SECONDS );
 	}
 
 	return $url;

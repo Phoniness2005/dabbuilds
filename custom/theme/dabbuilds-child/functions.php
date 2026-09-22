@@ -1,4 +1,5 @@
 <?php
+// resume-pin 2026-09-22T14:22Z
 /**
  * DAB Builds child theme (Hello Elementor).
  *
@@ -137,57 +138,8 @@ function dabbuilds_child_is_blog_index() {
  * @return string Empty if not found.
  */
 function dabbuilds_child_get_resume_file_url() {
-	$known = home_url( '/wp-content/uploads/2026/08/Resume-2026-V2.doc' );
-
-	$cached = get_transient( 'dabbuilds_resume_file_url_v4' );
-	if ( is_string( $cached ) && $cached !== '' ) {
-		return $cached;
-	}
-
-	// Prefer the current hosted file, then page content, then media search.
-	$candidates = array( $known );
-
-	$by_name = get_posts(
-		array(
-			'post_type'      => 'attachment',
-			'post_status'    => 'inherit',
-			'posts_per_page' => 5,
-			's'              => 'Resume',
-			'orderby'        => 'date',
-			'order'          => 'DESC',
-		)
-	);
-	foreach ( $by_name as $att ) {
-		$url = wp_get_attachment_url( $att->ID );
-		if ( $url && preg_match( '/\.(docx?|pdf)$/i', $url ) ) {
-			$candidates[] = $url;
-		}
-	}
-
-	// Page-body links are hints only — never override the known current file.
-	$page = get_page_by_path( 'dabs-resume' );
-	if ( $page ) {
-		if ( preg_match( '/href=["\']([^"\']+\.(?:docx?|pdf))["\']/i', $page->post_content, $m ) ) {
-			$candidates[] = $m[1];
-		}
-	}
-
-	// Last-resort known path (previous production file).
-	$candidates[] = home_url( '/wp-content/uploads/2025/07/Resume-V5-2025.doc' );
-
-	$url = '';
-	foreach ( $candidates as $candidate ) {
-		if ( is_string( $candidate ) && $candidate !== '' ) {
-			$url = esc_url_raw( $candidate );
-			break;
-		}
-	}
-
-	if ( $url ) {
-		set_transient( 'dabbuilds_resume_file_url_v4', $url, HOUR_IN_SECONDS );
-	}
-
-	return $url;
+	// Hard-pin current resume so page-body links / transients cannot revive a CDN-cached V1.
+	return home_url( '/wp-content/uploads/2026/08/Resume-2026-V2.doc' );
 }
 
 /**

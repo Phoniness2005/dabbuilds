@@ -1,6 +1,6 @@
 <?php
 /**
- * Singular entry (posts & pages) — bypass Elementor single location when needed.
+ * Singular entry (posts & pages) - bypass Elementor single location when needed.
  *
  * @package dabbuilds-child
  */

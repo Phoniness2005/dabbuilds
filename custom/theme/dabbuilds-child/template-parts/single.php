@@ -15,14 +15,14 @@ while ( have_posts() ) :
 	<main id="content" <?php post_class( 'site-main dab-singular' ); ?>>
 		<article class="dab-article">
 			<header class="dab-article__header">
-				<a class="dab-back" href="<?php echo esc_url( home_url( '/' ) ); ?>">
-					<?php echo esc_html__( 'Build log', 'dabbuilds-child' ); ?>
+				<a class="dab-back" href="<?php echo esc_url( home_url( '/build-log/' ) ); ?>">
+					<span aria-hidden="true">&larr;</span> <?php echo esc_html__( 'Build log', 'dabbuilds-child' ); ?>
 				</a>
 
 				<p class="dab-article__eyebrow">
 					<?php
 					if ( is_singular( 'post' ) ) {
-						echo esc_html( get_the_date( 'Y.m.d' ) );
+						echo esc_html( get_the_date( 'M j, Y' ) );
 					} else {
 						echo esc_html__( 'Page', 'dabbuilds-child' );
 					}

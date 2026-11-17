@@ -17,24 +17,33 @@ if ( ! defined( 'ABSPATH' ) ) {
  * add_filter( 'dabbuilds_child_hero_image', fn() => array( 'url' => '...', 'alt' => '...', 'width' => 1200, 'height' => 1500 ) );
  * or drop assets/stills/hero.jpg into the theme.
  *
- * @return array
+ * @return array<string, mixed>
  */
-function dabbuilds_child_hero_image() {
-	$img = array(
+function dabbuilds_child_hero_image(): array {
+	$img      = array(
 		'url'    => dabbuilds_child_theme_still_url( 'hero.jpg' ),
 		'alt'    => '',
 		'width'  => 1200,
 		'height' => 1500,
 	);
-	return (array) apply_filters( 'dabbuilds_child_hero_image', $img );
+	$filtered = apply_filters( 'dabbuilds_child_hero_image', $img );
+	if ( ! is_array( $filtered ) ) {
+		return $img;
+	}
+	return array(
+		'url'    => ( isset( $filtered['url'] ) && is_string( $filtered['url'] ) ) ? $filtered['url'] : '',
+		'alt'    => ( isset( $filtered['alt'] ) && is_string( $filtered['alt'] ) ) ? $filtered['alt'] : '',
+		'width'  => ( isset( $filtered['width'] ) && is_numeric( $filtered['width'] ) ) ? (int) $filtered['width'] : 1200,
+		'height' => ( isset( $filtered['height'] ) && is_numeric( $filtered['height'] ) ) ? (int) $filtered['height'] : 1500,
+	);
 }
 
 /**
  * Selected work cards. Image is optional (slug of a theme still).
  *
- * @return array
+ * @return list<array<string, mixed>>
  */
-function dabbuilds_child_selected_work() {
+function dabbuilds_child_selected_work(): array {
 	return array(
 		array(
 			'num'   => '01',
@@ -73,7 +82,7 @@ function dabbuilds_child_selected_work() {
  * @param string $title   Heading.
  * @param string $id      Heading id.
  */
-function dabbuilds_child_section_head( $eyebrow, $title, $id ) {
+function dabbuilds_child_section_head( $eyebrow, $title, $id ): void {
 	?>
 	<header class="dab-section__head">
 		<p class="dab-eyebrow"><?php echo esc_html( $eyebrow ); ?></p>
@@ -86,7 +95,7 @@ function dabbuilds_child_section_head( $eyebrow, $title, $id ) {
 /**
  * 1) Hero.
  */
-function dabbuilds_child_render_hero() {
+function dabbuilds_child_render_hero(): void {
 	static $printed = false;
 	if ( $printed || ! dabbuilds_child_is_blog_index() ) {
 		return;
@@ -97,7 +106,7 @@ function dabbuilds_child_render_hero() {
 	<section class="dab-hero" aria-labelledby="dab-hero-title">
 		<div class="dab-hero__inner">
 			<div class="dab-hero__copy">
-				<p class="dab-eyebrow">Daniel Bryant &middot; Pella, Iowa</p>
+				<p class="dab-eyebrow">Daniel Bryant</p>
 				<h1 class="dab-hero__title" id="dab-hero-title">
 					<span>Systems.</span>
 					<span>Security.</span>
@@ -111,14 +120,20 @@ function dabbuilds_child_render_hero() {
 					<a class="dab-link-cta" href="<?php echo esc_url( home_url( '/dabs-resume/' ) ); ?>"><?php echo esc_html__( 'Résumé', 'dabbuilds-child' ); ?> <span aria-hidden="true">&rarr;</span></a>
 				</div>
 			</div>
-			<figure class="dab-hero__frame<?php echo empty( $img['url'] ) ? ' is-placeholder' : ''; ?>">
-				<?php if ( ! empty( $img['url'] ) ) : ?>
+			<?php
+			$hero_url = ( isset( $img['url'] ) && is_string( $img['url'] ) ) ? $img['url'] : '';
+			$hero_alt = ( isset( $img['alt'] ) && is_string( $img['alt'] ) ) ? $img['alt'] : '';
+			$hero_w   = ( isset( $img['width'] ) && is_numeric( $img['width'] ) ) ? (int) $img['width'] : 0;
+			$hero_h   = ( isset( $img['height'] ) && is_numeric( $img['height'] ) ) ? (int) $img['height'] : 0;
+			?>
+			<figure class="dab-hero__frame<?php echo '' === $hero_url ? ' is-placeholder' : ''; ?>">
+				<?php if ( '' !== $hero_url ) : ?>
 					<img
 						class="dab-hero__img"
-						src="<?php echo esc_url( $img['url'] ); ?>"
-						alt="<?php echo esc_attr( $img['alt'] ); ?>"
-						width="<?php echo (int) $img['width']; ?>"
-						height="<?php echo (int) $img['height']; ?>"
+						src="<?php echo esc_url( $hero_url ); ?>"
+						alt="<?php echo esc_attr( $hero_alt ); ?>"
+						width="<?php echo (int) $hero_w; ?>"
+						height="<?php echo (int) $hero_h; ?>"
 						loading="eager"
 						decoding="async"
 					/>
@@ -138,19 +153,42 @@ function dabbuilds_child_render_hero() {
 /**
  * 2) What I do.
  */
-function dabbuilds_child_render_pillars() {
+function dabbuilds_child_render_pillars(): void {
 	?>
 	<section class="dab-section dab-pillars" aria-labelledby="dab-pillars-title">
 		<div class="dab-section__inner">
 			<?php dabbuilds_child_section_head( 'What I do', 'Three disciplines, one habit: do it right.', 'dab-pillars-title' ); ?>
 			<div class="dab-cards dab-cards--3">
-				<?php foreach ( dabbuilds_child_pillars() as $p ) : ?>
+				<?php
+				$dab_n = 0;
+				foreach ( dabbuilds_child_pillars() as $p ) :
+					if ( $dab_n >= Dabbuilds_Child_Bounds::PILLARS ) {
+						break;
+					}
+					++$dab_n;
+					if ( ! isset( $p['num'], $p['title'], $p['body'] ) || ! is_string( $p['num'] ) || ! is_string( $p['title'] ) ) {
+						continue;
+					}
+					if ( ! is_string( $p['body'] ) || ! isset( $p['tags'] ) || ! is_array( $p['tags'] ) ) {
+						continue;
+					}
+					?>
 					<article class="dab-card dab-pillar">
 						<p class="dab-pillar__num" aria-hidden="true"><?php echo esc_html( $p['num'] ); ?></p>
 						<h3 class="dab-card__title"><?php echo esc_html( $p['title'] ); ?></h3>
 						<p class="dab-card__body"><?php echo esc_html( $p['body'] ); ?></p>
 						<ul class="dab-tags" aria-label="<?php echo esc_attr__( 'Skills', 'dabbuilds-child' ); ?>">
-							<?php foreach ( $p['tags'] as $t ) : ?>
+							<?php
+							$dab_t = 0;
+							foreach ( $p['tags'] as $t ) :
+								if ( $dab_t >= Dabbuilds_Child_Bounds::TAGS ) {
+									break;
+								}
+								++$dab_t;
+								if ( ! is_string( $t ) ) {
+									continue;
+								}
+								?>
 								<li><?php echo esc_html( $t ); ?></li>
 							<?php endforeach; ?>
 						</ul>
@@ -165,19 +203,42 @@ function dabbuilds_child_render_pillars() {
 /**
  * 3) Selected work.
  */
-function dabbuilds_child_render_work() {
+function dabbuilds_child_render_work(): void {
 	?>
 	<section class="dab-section dab-section--band dab-work" id="dab-work" aria-labelledby="dab-work-title">
 		<div class="dab-section__inner">
 			<?php dabbuilds_child_section_head( 'Selected work', 'Things you can open and use.', 'dab-work-title' ); ?>
 			<div class="dab-cards dab-cards--3">
-				<?php foreach ( dabbuilds_child_selected_work() as $w ) : ?>
+				<?php
+				$dab_n = 0;
+				foreach ( dabbuilds_child_selected_work() as $w ) :
+					if ( $dab_n >= Dabbuilds_Child_Bounds::WORK ) {
+						break;
+					}
+					++$dab_n;
+					if ( ! isset( $w['num'], $w['kind'], $w['title'], $w['body'], $w['url'], $w['cta'], $w['tags'] ) ) {
+						continue;
+					}
+					if ( ! is_string( $w['num'] ) || ! is_string( $w['kind'] ) || ! is_string( $w['title'] ) || ! is_string( $w['body'] ) || ! is_string( $w['url'] ) || ! is_string( $w['cta'] ) || ! is_array( $w['tags'] ) ) {
+						continue;
+					}
+					?>
 					<article class="dab-card dab-work-card">
 						<p class="dab-work-card__meta"><span><?php echo esc_html( $w['num'] ); ?></span> <?php echo esc_html( $w['kind'] ); ?></p>
 						<h3 class="dab-card__title"><?php echo esc_html( $w['title'] ); ?></h3>
 						<p class="dab-card__body"><?php echo esc_html( $w['body'] ); ?></p>
 						<ul class="dab-tags">
-							<?php foreach ( $w['tags'] as $t ) : ?>
+							<?php
+							$dab_t = 0;
+							foreach ( $w['tags'] as $t ) :
+								if ( $dab_t >= Dabbuilds_Child_Bounds::TAGS ) {
+									break;
+								}
+								++$dab_t;
+								if ( ! is_string( $t ) ) {
+									continue;
+								}
+								?>
 								<li><?php echo esc_html( $t ); ?></li>
 							<?php endforeach; ?>
 						</ul>
@@ -194,13 +255,26 @@ function dabbuilds_child_render_work() {
 /**
  * 4) Experience snapshot (dates only).
  */
-function dabbuilds_child_render_experience() {
+function dabbuilds_child_render_experience(): void {
 	?>
 	<section class="dab-section dab-experience" aria-labelledby="dab-exp-title">
 		<div class="dab-section__inner">
 			<?php dabbuilds_child_section_head( 'Experience', 'Where the work happened.', 'dab-exp-title' ); ?>
 			<ol class="dab-timeline">
-				<?php foreach ( dabbuilds_child_experience() as $e ) : ?>
+				<?php
+				$dab_n = 0;
+				foreach ( dabbuilds_child_experience() as $e ) :
+					if ( $dab_n >= Dabbuilds_Child_Bounds::JOBS ) {
+						break;
+					}
+					++$dab_n;
+					if ( ! isset( $e['dates'], $e['role'], $e['org'] ) ) {
+						continue;
+					}
+					if ( ! is_string( $e['dates'] ) || ! is_string( $e['role'] ) || ! is_string( $e['org'] ) ) {
+						continue;
+					}
+					?>
 					<li class="dab-timeline__row">
 						<p class="dab-timeline__dates"><?php echo esc_html( $e['dates'] ); ?></p>
 						<div class="dab-timeline__body">
@@ -225,18 +299,38 @@ function dabbuilds_child_render_experience() {
  * @param WP_Query|null $query Query (null = main loop).
  * @param int           $limit Max rows (0 = all).
  */
-function dabbuilds_child_render_log_rows( $query = null, $limit = 0 ) {
+function dabbuilds_child_render_log_rows( $query = null, $limit = 0 ): void {
 	global $wp_query;
-	$q     = $query ? $query : $wp_query;
+	$q = $query instanceof WP_Query ? $query : $wp_query;
+	if ( ! $q instanceof WP_Query ) {
+		echo '<ol class="dab-ledger__list"></ol>';
+		return;
+	}
 	$count = 0;
+	$cap   = Dabbuilds_Child_Bounds::LOG_ROWS;
+	if ( $limit > 0 && $limit < $cap ) {
+		$cap = $limit;
+	}
 	echo '<ol class="dab-ledger__list">';
-	while ( $q->have_posts() ) {
+	while ( $q->have_posts() && $count < $cap ) {
 		$q->the_post();
 		++$count;
+		$permalink = get_permalink();
+		$datetime  = get_the_date( DATE_W3C );
+		$display   = get_the_date( 'M j, Y' );
+		if ( ! is_string( $permalink ) ) {
+			$permalink = '';
+		}
+		if ( ! is_string( $datetime ) ) {
+			$datetime = '';
+		}
+		if ( ! is_string( $display ) ) {
+			$display = '';
+		}
 		?>
 		<li class="dab-ledger__item">
-			<a class="dab-ledger__row" href="<?php echo esc_url( get_permalink() ); ?>">
-				<time class="dab-ledger__date" datetime="<?php echo esc_attr( get_the_date( DATE_W3C ) ); ?>"><?php echo esc_html( get_the_date( 'M j, Y' ) ); ?></time>
+			<a class="dab-ledger__row" href="<?php echo esc_url( $permalink ); ?>">
+				<time class="dab-ledger__date" datetime="<?php echo esc_attr( $datetime ); ?>"><?php echo esc_html( $display ); ?></time>
 				<span class="dab-ledger__title"><?php echo wp_kses_post( get_the_title() ); ?></span>
 				<span class="dab-ledger__arrow" aria-hidden="true">&rarr;</span>
 			</a>
@@ -255,7 +349,7 @@ function dabbuilds_child_render_log_rows( $query = null, $limit = 0 ) {
 /**
  * 5) Build log, latest 3.
  */
-function dabbuilds_child_render_log_teaser() {
+function dabbuilds_child_render_log_teaser(): void {
 	$q = new WP_Query(
 		array(
 			'post_type'           => 'post',
@@ -281,7 +375,7 @@ function dabbuilds_child_render_log_teaser() {
 /**
  * 6) Contact strip (also used at the foot of inner pages).
  */
-function dabbuilds_child_render_contact_strip() {
+function dabbuilds_child_render_contact_strip(): void {
 	$c = dabbuilds_child_contact();
 	?>
 	<section class="dab-section dab-contact-strip" aria-labelledby="dab-contact-title">
@@ -307,7 +401,7 @@ function dabbuilds_child_render_contact_strip() {
  * @param string $title   H1.
  * @param string $lede    Optional lede.
  */
-function dabbuilds_child_page_head( $eyebrow, $title, $lede = '' ) {
+function dabbuilds_child_page_head( $eyebrow, $title, $lede = '' ): void {
 	?>
 	<section class="dab-page-head">
 		<div class="dab-section__inner">
@@ -325,7 +419,7 @@ function dabbuilds_child_page_head( $eyebrow, $title, $lede = '' ) {
 /**
  * Full home page body.
  */
-function dabbuilds_child_render_home() {
+function dabbuilds_child_render_home(): void {
 	dabbuilds_child_render_hero();
 	dabbuilds_child_render_pillars();
 	dabbuilds_child_render_work();

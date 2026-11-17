@@ -16,7 +16,7 @@ Capitol Daylight is a bright deco, Apple-smooth redesign of the `dabbuilds-child
 - Type: Josefin Sans 600/700 caps for display, nav, and buttons (14px minimum). Inter for body at 17-18px. Retired Instrument Serif and IBM Plex Sans.
 - Lighting: Auto shows Day from 6 AM to 6 PM local (`06:00` to `17:59`); Night otherwise. Day/Night locks and `?dab-hour=` still work. Colors live in CSS; JS only flips `data-dab-period`.
 - Home order: Hero, What I do, Selected work, Experience, Build log (latest 3), Contact strip.
-- Nav: Home, Work, About, Résumé, Contact. Theme-served `/about/`, `/contact/`, and `/build-log/` when no WordPress page exists. Contact has no form (email daniel@dabbuilds.com, LinkedIn, GitHub).
+- Nav: Home, Work, About, Résumé, Contact. Theme-served `/about/`, `/contact/`, and `/build-log/` when no WordPress page exists. Contact has no form (email jobs@dabbuilds.com, LinkedIn, GitHub).
 - Native HTML résumé from `inc/profile.php` (Vermeer split, SNHU expected June 2027). Work cards replace the old cyan screenshot grid. Head tags add meta description, canonical, Open Graph, Twitter card, and theme favicons. The WordPress Site Icon is no longer printed.
 
 GitHub commits on this branch (text-only push, split for the connector): `6db0848`, `7b6da17`, `6845197`, `3fcd7b2`, `611e23a`, `dcade51`, and `f86d2ac` (`fix(theme): redirect stale /resume/ attachment to /dabs-resume/`). The packaged zip on the ops box was built from the box checkout at `16b14c1`, which carries the same theme changes.
@@ -94,7 +94,7 @@ Copy source: `/workspace/design-review/2026-11-16/linkedin-copy.md`.
 
   I started as an Army machinist (91E) and graduated from the NTMA machinist program with a 4.0 and Honor Graduate recognition. I have set up and edited programs on CNC lathes and mills, led the plate side of a machine shop, and today I am a Production Supervisor in machining at Emerson, leading a team of 14 machinists. Machining taught me to measure carefully, respect a tolerance, and document what I find. That habit makes me a better troubleshooter, and IT taught me to write things down so the next person can follow them.
 
-  I am completing a B.A. in General Studies with a Mathematics concentration at Southern New Hampshire University, expected June 2027. At home I work in CAD, run a 3D printer, and write about what I build at dabbuilds.com. The best way to reach me is daniel@dabbuilds.com.
+  I am completing a B.A. in General Studies with a Mathematics concentration at Southern New Hampshire University, expected June 2027. At home I work in CAD, run a 3D printer, and write about what I build at dabbuilds.com. The best way to reach me is jobs@dabbuilds.com.
 
 - Experience:
   - Emerson Production Supervisor, Machining, Nov 2025 to Present.

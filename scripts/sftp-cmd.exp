@@ -40,7 +40,13 @@ expect {
   }
 }
 
+set seen 0
 foreach cmd $cmds {
+  incr seen
+  if {$seen > 32} {
+    puts stderr "Too many SFTP commands"
+    exit 1
+  }
   send -- "$cmd\r"
   expect {
     -re {sftp>} {}

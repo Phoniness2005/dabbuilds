@@ -9,8 +9,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-while ( have_posts() ) :
+$dab_posts = 0;
+while ( have_posts() && $dab_posts < Dabbuilds_Child_Bounds::SINGULAR ) :
 	the_post();
+	++$dab_posts;
+	$dab_date = get_the_date( 'M j, Y' );
+	if ( ! is_string( $dab_date ) ) {
+		$dab_date = '';
+	}
 	?>
 	<main id="content" <?php post_class( 'site-main dab-singular' ); ?>>
 		<article class="dab-article">
@@ -22,7 +28,7 @@ while ( have_posts() ) :
 				<p class="dab-article__eyebrow">
 					<?php
 					if ( is_singular( 'post' ) ) {
-						echo esc_html( get_the_date( 'M j, Y' ) );
+						echo esc_html( $dab_date );
 					} else {
 						echo esc_html__( 'Page', 'dabbuilds-child' );
 					}

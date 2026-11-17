@@ -3,28 +3,71 @@
  * DAB Builds child theme (Hello Elementor). "Capitol Daylight" design system.
  *
  * Source of truth: https://github.com/Phoniness2005/dabbuilds
+ *
+ * @package dabbuilds-child
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+require_once get_stylesheet_directory() . '/inc/class-dabbuilds-child-bounds.php';
 require_once get_stylesheet_directory() . '/inc/profile.php';
 require_once get_stylesheet_directory() . '/inc/routes.php';
 require_once get_stylesheet_directory() . '/inc/head-meta.php';
 require_once get_stylesheet_directory() . '/inc/home-sections.php';
 
 /**
+ * Request path source. Non-strings recover to an empty path.
+ *
+ * @return string
+ */
+function dabbuilds_child_request_uri(): string {
+	if ( ! isset( $_SERVER['REQUEST_URI'] ) ) {
+		return '';
+	}
+	$raw = wp_unslash( $_SERVER['REQUEST_URI'] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- sanitized on the next line when it is a string.
+	if ( ! is_string( $raw ) ) {
+		return '';
+	}
+	return sanitize_text_field( $raw );
+}
+
+/**
+ * Integer query var. Non-numeric values recover to 0.
+ *
+ * @param string $key Query var.
+ * @return int
+ */
+function dabbuilds_child_query_int( $key ): int {
+	if ( '' === $key ) {
+		return 0;
+	}
+	$value = get_query_var( $key );
+	if ( is_int( $value ) ) {
+		return $value;
+	}
+	if ( is_string( $value ) && is_numeric( $value ) ) {
+		return (int) $value;
+	}
+	return 0;
+}
+
+/**
  * Cache-bust string for theme CSS/JS (Cloudflare caches by ?ver=).
  */
-function dabbuilds_child_asset_ver() {
-	return '20261116-capitol-daylight-1';
+function dabbuilds_child_asset_ver(): string {
+	$ver = '20261117-power-of-10-1';
+	if ( 1 !== preg_match( '/^[a-z0-9.-]{1,64}$/', $ver ) ) {
+		return '0';
+	}
+	return $ver;
 }
 
 /**
  * Enqueue fonts, parent/child styles, and custom assets.
  */
-function dabbuilds_child_enqueue_assets() {
+function dabbuilds_child_enqueue_assets(): void {
 	$ver = dabbuilds_child_asset_ver();
 
 	// Josefin Sans (deco display caps) + Inter (body).
@@ -32,7 +75,7 @@ function dabbuilds_child_enqueue_assets() {
 		'dabbuilds-fonts',
 		'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Josefin+Sans:wght@600;700&display=swap',
 		array(),
-		null
+		null // phpcs:ignore WordPress.WP.EnqueuedResourceParameters.MissingVersion -- Google Fonts CSS must not gain a ver query.
 	);
 
 	wp_enqueue_style(
@@ -90,7 +133,7 @@ add_action( 'wp_enqueue_scripts', 'dabbuilds_child_enqueue_assets', 20 );
  * buttons lock the choice. Reads the local clock and localStorage only;
  * nothing is sent to the server. ?dab-hour=0..23 forces an hour for screenshots.
  */
-function dabbuilds_child_lighting_boot() {
+function dabbuilds_child_lighting_boot(): void {
 	?>
 	<script>
 	(function () {
@@ -119,20 +162,24 @@ add_action( 'wp_head', 'dabbuilds_child_lighting_boot', 0 );
 /**
  * Preconnect to Google Fonts.
  *
- * @param array  $urls          URLs to print for resource hints.
- * @param string $relation_type The relation type the URLs are printed for.
- * @return array
+ * @param array<int, mixed> $urls         URLs to print for resource hints.
+ * @param string            $relation_type The relation type the URLs are printed for.
+ * @return array<int, mixed>
  */
 function dabbuilds_child_resource_hints( $urls, $relation_type ) {
-	if ( 'preconnect' === $relation_type ) {
-		$urls[] = array(
-			'href' => 'https://fonts.googleapis.com',
-		);
-		$urls[] = array(
-			'href'        => 'https://fonts.gstatic.com',
-			'crossorigin' => 'anonymous',
-		);
+	if ( 'preconnect' !== $relation_type ) {
+		return $urls;
 	}
+	if ( count( $urls ) + 2 > Dabbuilds_Child_Bounds::HINTS ) {
+		return $urls;
+	}
+	$urls[] = array(
+		'href' => 'https://fonts.googleapis.com',
+	);
+	$urls[] = array(
+		'href'        => 'https://fonts.gstatic.com',
+		'crossorigin' => 'anonymous',
+	);
 	return $urls;
 }
 add_filter( 'wp_resource_hints', 'dabbuilds_child_resource_hints', 10, 2 );
@@ -140,7 +187,7 @@ add_filter( 'wp_resource_hints', 'dabbuilds_child_resource_hints', 10, 2 );
 /**
  * Whether the current request is the main blog index (not a single post/page).
  */
-function dabbuilds_child_is_blog_index() {
+function dabbuilds_child_is_blog_index(): bool {
 	return ( is_home() || is_front_page() ) && ! is_singular() && ! dabbuilds_child_virtual_route();
 }
 
@@ -164,8 +211,9 @@ function dabbuilds_child_get_resume_file_url() {
  *
  * @return string
  */
-function dabbuilds_child_resume_download_url() {
-	return (string) apply_filters( 'dabbuilds_child_resume_download_url', '' );
+function dabbuilds_child_resume_download_url(): string {
+	$filtered = apply_filters( 'dabbuilds_child_resume_download_url', '' );
+	return is_string( $filtered ) ? $filtered : '';
 }
 
 /**
@@ -231,7 +279,7 @@ add_filter( 'template_include', 'dabbuilds_child_force_templates', 99 );
  *
  * @param string $extra Extra class.
  */
-function dabbuilds_child_divider( $extra = '' ) {
+function dabbuilds_child_divider( $extra = '' ): void {
 	echo '<div class="dab-divider ' . esc_attr( $extra ) . '" aria-hidden="true"><svg viewBox="0 0 120 14" width="120" height="14" focusable="false"><path d="M0 13h40v-4h8v-4h8V1h8v4h8v4h8v4h40" fill="none" stroke="currentColor" stroke-width="1.25"/></svg></div>';
 }
 
@@ -287,13 +335,13 @@ function dabbuilds_child_play_url() {
 /**
  * Serve the Pong hub and versioned game files at /play/ without WordPress chrome.
  */
-function dabbuilds_child_serve_play_game() {
-	$request_uri = isset( $_SERVER['REQUEST_URI'] ) ? wp_unslash( $_SERVER['REQUEST_URI'] ) : '';
+function dabbuilds_child_serve_play_game(): void {
+	$request_uri = dabbuilds_child_request_uri();
 	$path        = (string) wp_parse_url( $request_uri, PHP_URL_PATH );
 	$path        = untrailingslashit( $path );
 
 	$rel = '';
-	if ( $path === '/play' || $path === '/play/index.html' ) {
+	if ( '/play' === $path || '/play/index.html' === $path ) {
 		$rel = 'index.html';
 	} elseif ( preg_match( '#^/play/(v[12])$#', $path, $m ) ) {
 		$rel = $m[1] . '/index.html';
@@ -303,7 +351,7 @@ function dabbuilds_child_serve_play_game() {
 		return;
 	}
 
-	$file = get_stylesheet_directory() . '/play/' . $rel;
+	$file      = get_stylesheet_directory() . '/play/' . $rel;
 	$real_play = realpath( get_stylesheet_directory() . '/play' );
 	$real_file = realpath( $file );
 	if ( ! $real_play || ! $real_file || strpos( $real_file, $real_play ) !== 0 || ! is_readable( $real_file ) ) {
@@ -324,7 +372,11 @@ function dabbuilds_child_serve_play_game() {
 	header( 'Content-Type: ' . $mime );
 	header( 'X-Robots-Tag: noindex, follow' );
 	header( 'Cache-Control: public, max-age=60, must-revalidate' );
-	readfile( $real_file );
+	// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_readfile -- stream one theme file; WP_Filesystem would buffer it.
+	$bytes = readfile( $real_file );
+	if ( false === $bytes ) {
+		exit;
+	}
 	exit;
 }
 add_action( 'template_redirect', 'dabbuilds_child_serve_play_game', 0 );
@@ -336,7 +388,7 @@ add_action( 'template_redirect', 'dabbuilds_child_serve_play_game', 0 );
  * @return string
  */
 function dabbuilds_child_rewrite_game_url( $content ) {
-	if ( ! is_string( $content ) || $content === '' ) {
+	if ( '' === $content ) {
 		return $content;
 	}
 
@@ -354,7 +406,7 @@ add_filter( 'the_content', 'dabbuilds_child_rewrite_game_url', 20 );
 /**
  * Extra Elementor hooks - print hero if archive location still runs.
  */
-function dabbuilds_child_elementor_archive_hero() {
+function dabbuilds_child_elementor_archive_hero(): void {
 	dabbuilds_child_render_hero();
 }
 add_action( 'elementor/theme/before_do_archive', 'dabbuilds_child_elementor_archive_hero' );
@@ -363,7 +415,7 @@ add_action( 'elementor/theme/before_do_archive', 'dabbuilds_child_elementor_arch
  * Serve resume downloads with Content-Disposition: attachment when ?download=1.
  * Keeps normal URL for Office Online preview (inline).
  */
-function dabbuilds_child_resume_download_headers() {
+function dabbuilds_child_resume_download_headers(): void {
 	if ( empty( $_GET['dab_download'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		return;
 	}

@@ -45,7 +45,7 @@ function dabbuilds_child_icon_url( $file ) {
  * @return string
  */
 function dabbuilds_child_default_description() {
-	return 'Daniel Bryant in Pella, Iowa. IT and systems support, machining and CNC, CAD, and 3D printing. Resume, selected work, and build log.';
+	return 'Daniel Bryant. IT and systems support, machining and CNC, CAD, and 3D printing. Resume, selected work, and build log.';
 }
 
 /**
@@ -69,8 +69,10 @@ function dabbuilds_child_meta_description() {
 	} elseif ( is_singular() ) {
 		$post = get_queried_object();
 		if ( $post instanceof WP_Post ) {
-			$text = has_excerpt( $post ) ? $post->post_excerpt : $post->post_content;
-			$text = trim( preg_replace( '/\s+/', ' ', wp_strip_all_tags( strip_shortcodes( $text ) ) ) );
+			$text      = has_excerpt( $post ) ? $post->post_excerpt : $post->post_content;
+			$stripped  = wp_strip_all_tags( strip_shortcodes( $text ) );
+			$collapsed = preg_replace( '/\s+/', ' ', $stripped );
+			$text      = is_string( $collapsed ) ? trim( $collapsed ) : '';
 			if ( '' !== $text ) {
 				$desc = wp_trim_words( $text, 28, '...' );
 			}
@@ -79,7 +81,8 @@ function dabbuilds_child_meta_description() {
 		$desc = sprintf( 'Build log entries tagged %s, from DAB Builds.', single_term_title( '', false ) );
 	}
 
-	return (string) apply_filters( 'dabbuilds_child_meta_description', $desc );
+	$filtered = apply_filters( 'dabbuilds_child_meta_description', $desc );
+	return is_string( $filtered ) ? $filtered : $desc;
 }
 
 /**
@@ -95,17 +98,19 @@ function dabbuilds_child_canonical_url() {
 	} elseif ( is_singular() ) {
 		$url = wp_get_canonical_url();
 	} elseif ( is_front_page() || is_home() ) {
-		$paged = (int) get_query_var( 'paged' );
+		$paged = dabbuilds_child_query_int( 'paged' );
 		$url   = $paged > 1 ? get_pagenum_link( $paged ) : home_url( '/' );
 	} elseif ( is_category() || is_tag() || is_tax() ) {
-		$url = get_term_link( get_queried_object() );
+		$term = get_queried_object();
+		$url  = $term instanceof WP_Term ? get_term_link( $term ) : '';
 	} elseif ( is_author() ) {
 		$url = get_author_posts_url( get_queried_object_id() );
 	}
-	if ( is_wp_error( $url ) ) {
+	if ( is_wp_error( $url ) || ! is_string( $url ) ) {
 		$url = '';
 	}
-	return (string) apply_filters( 'dabbuilds_child_canonical_url', $url );
+	$filtered = apply_filters( 'dabbuilds_child_canonical_url', $url );
+	return is_string( $filtered ) ? $filtered : $url;
 }
 
 /**
@@ -114,13 +119,15 @@ function dabbuilds_child_canonical_url() {
  * @return string
  */
 function dabbuilds_child_og_image() {
-	return (string) apply_filters( 'dabbuilds_child_og_image', dabbuilds_child_icon_url( 'og-image-1200x630.png' ) );
+	$image    = dabbuilds_child_icon_url( 'og-image-1200x630.png' );
+	$filtered = apply_filters( 'dabbuilds_child_og_image', $image );
+	return is_string( $filtered ) ? $filtered : $image;
 }
 
 /**
  * Print description, canonical, OG, and Twitter tags.
  */
-function dabbuilds_child_print_meta() {
+function dabbuilds_child_print_meta(): void {
 	if ( is_404() && ! dabbuilds_child_virtual_route() ) {
 		return;
 	}
@@ -170,7 +177,7 @@ add_action( 'wp_head', 'dabbuilds_child_print_meta', 2 );
 /**
  * Core prints its own canonical on singular views; ours replaces it.
  */
-function dabbuilds_child_swap_core_canonical() {
+function dabbuilds_child_swap_core_canonical(): void {
 	if ( ! dabbuilds_child_seo_plugin_active() ) {
 		remove_action( 'wp_head', 'rel_canonical' );
 	}
@@ -181,7 +188,7 @@ add_action( 'wp', 'dabbuilds_child_swap_core_canonical' );
  * Theme favicons. Replaces the WordPress Site Icon (the old Iron Man crop),
  * so the icon is versioned in git instead of the media library.
  */
-function dabbuilds_child_print_icons() {
+function dabbuilds_child_print_icons(): void {
 	$v = dabbuilds_child_asset_ver();
 	printf( '<link rel="icon" href="%s?v=%s" sizes="any">' . "\n", esc_url( dabbuilds_child_icon_url( 'favicon.ico' ) ), esc_attr( $v ) );
 	printf( '<link rel="icon" type="image/png" sizes="32x32" href="%s?v=%s" media="(prefers-color-scheme: light)">' . "\n", esc_url( dabbuilds_child_icon_url( 'favicon-day-32.png' ) ), esc_attr( $v ) );
@@ -198,14 +205,18 @@ remove_action( 'wp_head', 'wp_site_icon', 99 );
  * Serve the theme favicon.ico at /favicon.ico when the request reaches WordPress.
  * (WordPress fires do_faviconico for that path; a static file on the host wins if present.)
  */
-function dabbuilds_child_favicon_ico() {
+function dabbuilds_child_favicon_ico(): void {
 	$file = get_stylesheet_directory() . '/assets/icons/favicon.ico';
 	if ( ! is_readable( $file ) ) {
 		return;
 	}
 	header( 'Content-Type: image/x-icon' );
 	header( 'Cache-Control: public, max-age=86400' );
-	readfile( $file );
+	// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_readfile -- stream the theme favicon; WP_Filesystem would buffer it.
+	$bytes = readfile( $file );
+	if ( false === $bytes ) {
+		exit;
+	}
 	exit;
 }
 add_action( 'do_faviconico', 'dabbuilds_child_favicon_ico', 1 );

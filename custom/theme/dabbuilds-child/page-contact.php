@@ -39,7 +39,7 @@ $c = dabbuilds_child_contact();
 					<a class="dab-link-cta" href="<?php echo esc_url( $c['github'] ); ?>" rel="noopener noreferrer">View code <span aria-hidden="true">&rarr;</span></a>
 				</article>
 			</div>
-			<p class="dab-contact-note">Based in <?php echo esc_html( $c['location'] ); ?>. <a href="<?php echo esc_url( home_url( '/dabs-resume/' ) ); ?>">Résumé</a> available on this site.</p>
+			<p class="dab-contact-note"><a href="<?php echo esc_url( home_url( '/dabs-resume/' ) ); ?>">Résumé</a> available on this site.</p>
 		</div>
 	</section>
 </main>

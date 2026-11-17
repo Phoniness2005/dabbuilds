@@ -136,7 +136,7 @@ No database or Elementor template rollback required for this CSS-only change.
 
 | Path | Change |
 |---|---|
-| `custom/theme/dabbuilds-child/functions.php` | Hero rebuilt as Product Still grid: `.dab-hero__copy` (eyebrow / title / lede / CTAs) + `.dab-hero__artifact` (optional `dabbuilds_child_shot_url` still, else CSS `.dab-hero__artifact-core` + meta `Nano LR · still`). Pillars `01/02/03` moved to `.dab-pillars` after inner. New `dabbuilds_child_render_hire_strip()` (Available for hire · production/IT/ops + maker · `/dabs-resume/` · mailto daniel@ + jobs@). Asset ver bumped. |
+| `custom/theme/dabbuilds-child/functions.php` | Hero rebuilt as Product Still grid: `.dab-hero__copy` (eyebrow / title / lede / CTAs) + `.dab-hero__artifact` (optional `dabbuilds_child_shot_url` still, else CSS `.dab-hero__artifact-core` + meta `Nano LR · still`). Pillars `01/02/03` moved to `.dab-pillars` after inner. New `dabbuilds_child_render_hire_strip()` (Available for hire · production/IT/ops + maker · `/dabs-resume/` · mailto jobs@). Asset ver bumped. |
 | `custom/theme/dabbuilds-child/template-parts/archive.php` | Hire strip after hero; catalog → `.dab-ledger` with heading “Build log”; rows are single-link `.dab-ledger__row` (serial · title · date); excerpts removed; thumbnails kept in markup but hidden on home via CSS. |
 | `custom/theme/dabbuilds-child/assets/custom.css` | Styles for artifact stage, pillars strip, hire strip, ledger rows; responsive stack (artifact first on small screens; ledger 2-row mobile); no cyan; Instrument Serif + IBM Plex tokens kept; `lighting.js` Auto dark behavior untouched. |
 

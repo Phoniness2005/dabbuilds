@@ -16,17 +16,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Theme-served routes and their titles and meta descriptions.
  *
- * @return array
+ * @return array<string, array{title: string, description: string}>
  */
-function dabbuilds_child_routes() {
+function dabbuilds_child_routes(): array {
 	return array(
 		'about'     => array(
 			'title'       => 'About',
-			'description' => 'About Daniel Bryant: IT and systems support, machining supervision, and a home shop for CAD and 3D printing in Pella, Iowa.',
+			'description' => 'About Daniel Bryant: IT and systems support, machining supervision, and a home shop for CAD and 3D printing.',
 		),
 		'contact'   => array(
 			'title'       => 'Contact',
-			'description' => 'Contact Daniel Bryant by email at daniel@dabbuilds.com, or find him on LinkedIn and GitHub.',
+			'description' => 'Contact Daniel Bryant by email at jobs@dabbuilds.com, or find him on LinkedIn and GitHub.',
 		),
 		'build-log' => array(
 			'title'       => 'Build log',
@@ -44,7 +44,7 @@ function dabbuilds_child_routes() {
  */
 function dabbuilds_child_virtual_route() {
 	static $route = null;
-	if ( null !== $route ) {
+	if ( is_string( $route ) ) {
 		return $route;
 	}
 	$route = '';
@@ -52,7 +52,8 @@ function dabbuilds_child_virtual_route() {
 		$route = null;
 		return '';
 	}
-	$path = isset( $_SERVER['REQUEST_URI'] ) ? (string) wp_parse_url( wp_unslash( $_SERVER['REQUEST_URI'] ), PHP_URL_PATH ) : '';
+	$raw  = dabbuilds_child_request_uri();
+	$path = (string) wp_parse_url( $raw, PHP_URL_PATH );
 	$home = (string) wp_parse_url( home_url( '/' ), PHP_URL_PATH );
 	if ( $home && '/' !== $home && 0 === strpos( $path, rtrim( $home, '/' ) ) ) {
 		$path = substr( $path, strlen( rtrim( $home, '/' ) ) );
@@ -67,11 +68,14 @@ function dabbuilds_child_virtual_route() {
 /**
  * Turn the 404 into a 200 for theme-served routes.
  */
-function dabbuilds_child_route_status() {
+function dabbuilds_child_route_status(): void {
 	if ( ! dabbuilds_child_virtual_route() ) {
 		return;
 	}
 	global $wp_query;
+	if ( ! $wp_query instanceof WP_Query ) {
+		return;
+	}
 	$wp_query->is_404 = false;
 	status_header( 200 );
 }
@@ -95,10 +99,10 @@ add_filter( 'pre_get_document_title', 'dabbuilds_child_route_title', 20 );
 /**
  * Body classes for theme-served routes.
  *
- * @param array $classes Classes.
- * @return array
+ * @param array<int, string> $classes Classes.
+ * @return array<int, string>
  */
-function dabbuilds_child_route_body_class( $classes ) {
+function dabbuilds_child_route_body_class( $classes ): array {
 	$route = dabbuilds_child_virtual_route();
 	if ( $route ) {
 		$classes   = array_diff( $classes, array( 'error404' ) );
@@ -125,10 +129,10 @@ function dabbuilds_child_is_section( $slug ) {
 /**
  * Home title: add a plain descriptor when the site has no tagline.
  *
- * @param array $parts Title parts.
- * @return array
+ * @param array<string, string> $parts Title parts.
+ * @return array<string, string>
  */
-function dabbuilds_child_home_title_parts( $parts ) {
+function dabbuilds_child_home_title_parts( $parts ): array {
 	if ( ( is_home() || is_front_page() ) && empty( $parts['tagline'] ) && ! dabbuilds_child_virtual_route() ) {
 		$parts['tagline'] = 'Daniel Bryant, IT, Systems, and Making';
 	}
@@ -140,7 +144,7 @@ add_filter( 'document_title_parts', 'dabbuilds_child_home_title_parts' );
  * /resume/ resolves to an old media attachment (resume.png from Aug 2026).
  * Send it to the HTML résumé instead. Remove once the attachment slug is fixed in wp-admin.
  */
-function dabbuilds_child_redirect_resume_attachment() {
+function dabbuilds_child_redirect_resume_attachment(): void {
 	if ( is_attachment() && 'resume' === get_post_field( 'post_name', get_queried_object_id() ) ) {
 		wp_safe_redirect( home_url( '/dabs-resume/' ), 301 );
 		exit;

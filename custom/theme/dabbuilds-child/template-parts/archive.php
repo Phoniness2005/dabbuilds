@@ -10,10 +10,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 global $wp_query;
-$paged = max( 1, (int) get_query_var( 'paged' ) );
+$dab_page = max( 1, dabbuilds_child_query_int( 'paged' ) );
 ?>
 <main id="content" class="site-main">
-	<?php if ( dabbuilds_child_is_blog_index() && 1 === $paged ) : ?>
+	<?php if ( dabbuilds_child_is_blog_index() && 1 === $dab_page ) : ?>
 
 		<?php dabbuilds_child_render_home(); ?>
 
@@ -24,21 +24,21 @@ $paged = max( 1, (int) get_query_var( 'paged' ) );
 			$heading = single_term_title( '', false );
 		} elseif ( is_author() ) {
 			$eyebrow = __( 'Author', 'dabbuilds-child' );
-			$heading = get_the_author_meta( 'display_name', (int) get_query_var( 'author' ) );
+			$heading = get_the_author_meta( 'display_name', dabbuilds_child_query_int( 'author' ) );
 		} elseif ( is_search() ) {
 			$eyebrow = __( 'Search', 'dabbuilds-child' );
 			$heading = get_search_query();
 		} else {
 			$eyebrow = __( 'Build log', 'dabbuilds-child' );
 			/* translators: %d: page number */
-			$heading = sprintf( __( 'Page %d', 'dabbuilds-child' ), $paged );
+			$heading = sprintf( __( 'Page %d', 'dabbuilds-child' ), $dab_page );
 		}
 		?>
 		<section class="dab-page-head">
 			<div class="dab-section__inner">
 				<a class="dab-back" href="<?php echo esc_url( home_url( '/build-log/' ) ); ?>"><span aria-hidden="true">&larr;</span> <?php echo esc_html__( 'Build log', 'dabbuilds-child' ); ?></a>
 				<p class="dab-eyebrow"><?php echo esc_html( $eyebrow ); ?></p>
-				<h1 class="dab-page-title"><?php echo esc_html( $heading ); ?></h1>
+				<h1 class="dab-page-title"><?php echo esc_html( is_string( $heading ) ? $heading : '' ); ?></h1>
 				<?php dabbuilds_child_divider(); ?>
 			</div>
 		</section>
@@ -50,7 +50,7 @@ $paged = max( 1, (int) get_query_var( 'paged' ) );
 					<p><?php echo esc_html__( 'Nothing here yet.', 'dabbuilds-child' ); ?></p>
 				<?php endif; ?>
 
-				<?php if ( $wp_query->max_num_pages > 1 ) : ?>
+				<?php if ( $wp_query instanceof WP_Query && $wp_query->max_num_pages > 1 ) : ?>
 					<nav class="pagination" aria-label="<?php echo esc_attr__( 'Posts', 'dabbuilds-child' ); ?>">
 						<div class="nav-previous"><?php previous_posts_link( esc_html__( 'Newer', 'dabbuilds-child' ) ); ?></div>
 						<div class="nav-next"><?php next_posts_link( esc_html__( 'Older', 'dabbuilds-child' ) ); ?></div>

@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<ruleset name="dabbuilds">
+  <description>WordPress coding standards for first-party PHP.</description>
+  <file>custom/theme/dabbuilds-child</file>
+  <file>custom/plugins/dabbuilds-hardening</file>
+  <exclude-pattern>*/play/*</exclude-pattern>
+  <arg name="extensions" value="php"/>
+  <config name="minimum_supported_wp_version" value="6.0"/>
+  <rule ref="WordPress"/>
+  <rule ref="WordPress.WP.I18n">
+    <properties>
+      <property name="text_domain" type="array">
+        <element value="dabbuilds-child"/>
+        <element value="dabbuilds-hardening"/>
+      </property>
+    </properties>
+  </rule>
+</ruleset>

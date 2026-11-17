@@ -192,6 +192,15 @@ body:not([class*="elementor-page-"]) .site-main,
 .dab-divider { color: var(--dab-gilt); display: flex; align-items: center; gap: 0; margin: 22px 0 0; }
 .dab-divider::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, var(--dab-gilt), transparent); opacity: .7; }
 .dab-divider svg { display: block; flex: none; }
+@media (max-width: 860px) {
+	/* The trailing rule is centered on the 14px ziggurat, so under a wrapped
+	   heading it reads as a second stroke floating above the step baseline.
+	   On small screens, sit that rule on the path feet (y=13 of 14). Desktop
+	   alignment is left as drawn. */
+	.dab-divider { align-items: flex-end; }
+	.dab-divider svg { flex: 0 0 120px; width: 120px; height: 14px; overflow: visible; }
+	.dab-divider::after { align-self: flex-end; height: 1.25px; margin-bottom: 0.375px; }
+}
 
 /* ---------- Hero ---------- */
 .dab-hero { padding: clamp(40px, 7vw, 96px) 0 clamp(56px, 8vw, 112px); }

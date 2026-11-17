@@ -1,0 +1,14 @@
+{
+  "name": "dabbuilds-analyzers",
+  "private": true,
+  "type": "module",
+  "description": "Dev-only Power of 10 JavaScript analyzer. Not deployed.",
+  "scripts": {
+    "lint:js": "eslint custom/theme/dabbuilds-child/assets/custom.js custom/theme/dabbuilds-child/assets/lighting.js"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.15.0",
+    "eslint": "^9.15.0",
+    "globals": "^15.12.0"
+  }
+}

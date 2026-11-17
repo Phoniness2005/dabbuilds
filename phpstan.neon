@@ -1,0 +1,8 @@
+parameters:
+  level: max
+  paths:
+    - custom/theme/dabbuilds-child
+    - custom/plugins/dabbuilds-hardening
+  excludePaths:
+    - custom/theme/dabbuilds-child/play/*
+  treatPhpDocTypesAsCertain: true

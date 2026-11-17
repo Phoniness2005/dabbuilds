@@ -20,7 +20,7 @@ nav, and buttons (14px minimum); Inter body at 17-18px.
 - Nav: Home, Work, About, Résumé, Contact.
 - `/about/`, `/contact/`, `/build-log/` are served by the theme (`inc/routes.php`) when no WP page exists. If a WP page
   with the same slug is created later, it uses the same template.
-- Contact page has no form (nothing sends mail). Email daniel@dabbuilds.com, LinkedIn, GitHub.
+- Contact page has no form (nothing sends mail). Email jobs@dabbuilds.com, LinkedIn, GitHub.
 - Résumé page is native HTML (`page-dabs-resume.php`) from `inc/profile.php`, with print-to-PDF styles. The Office embed
   of `Resume-2026-V2.doc` is gone because that file still has the old Vermeer dates and SNHU line. A corrected
   download appears when the `dabbuilds_child_resume_download_url` filter returns a URL.

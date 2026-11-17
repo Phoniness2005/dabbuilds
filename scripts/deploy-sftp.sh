@@ -10,6 +10,7 @@
 #   ./scripts/deploy-sftp.sh --dry-run             # print plan, no upload
 #
 set -euo pipefail
+# shellcheck source=lib-env.sh
 source "$(cd "$(dirname "$0")" && pwd)/lib-env.sh"
 
 YES=0
@@ -17,7 +18,13 @@ DRY_RUN=0
 THEME_ONLY=0
 PLUGINS_ONLY=0
 
+arg_i=0
 for arg in "$@"; do
+  arg_i=$((arg_i + 1))
+  if [[ "$arg_i" -gt 32 ]]; then
+    echo "Too many arguments" >&2
+    exit 1
+  fi
   case "$arg" in
     --yes|-y) YES=1 ;;
     --dry-run) DRY_RUN=1 ;;
@@ -61,8 +68,18 @@ plan_theme() {
   fi
   echo "Theme:  ${CHILD_THEME_LOCAL}  ->  ${CHILD_THEME_REMOTE}"
   CMDS+=("mkdir ${CHILD_THEME_REMOTE}")
+  file_i=0
   while IFS= read -r -d '' f; do
-    rel="${f#${CHILD_THEME_LOCAL}/}"
+    file_i=$((file_i + 1))
+    if [[ "$file_i" -gt 5000 ]]; then
+      echo "Too many theme files" >&2
+      exit 1
+    fi
+    if [[ "${#CMDS[@]}" -gt 10000 ]]; then
+      echo "Too many SFTP commands" >&2
+      exit 1
+    fi
+    rel="${f#"${CHILD_THEME_LOCAL}/"}"
     [[ "$(basename "$f")" == ".gitkeep" ]] && continue
     mkdir_parents "${CHILD_THEME_REMOTE}" "$(dirname "$rel")"
     CMDS+=("put ${f} ${CHILD_THEME_REMOTE}/${rel}")
@@ -76,7 +93,15 @@ mkdir_parents() {
   [[ "$rel" == "." || -z "$rel" ]] && return
   local IFS=/
   local part
+  local depth=0
+  # Word splitting on IFS=/ is the path walk. The pieces are not globs.
+  # shellcheck disable=SC2086
   for part in $rel; do
+    depth=$((depth + 1))
+    if [[ "$depth" -gt 32 ]]; then
+      echo "Path too deep: ${rel}" >&2
+      exit 1
+    fi
     [[ -z "$part" ]] && continue
     dir="${dir}/${part}"
     CMDS+=("mkdir ${dir}")
@@ -88,7 +113,13 @@ plan_plugins() {
     return
   fi
   shopt -s nullglob
+  plugin_i=0
   for plugin_dir in "${PLUGINS_LOCAL}"/*/; do
+    plugin_i=$((plugin_i + 1))
+    if [[ "$plugin_i" -gt 32 ]]; then
+      echo "Too many plugins" >&2
+      exit 1
+    fi
     name="$(basename "$plugin_dir")"
     if ! find "$plugin_dir" -type f \( -name '*.php' -o -name '*.js' -o -name '*.css' \) | grep -q .; then
       echo "Plugin skip (no code): ${name}"
@@ -97,8 +128,18 @@ plan_plugins() {
     remote="${PLUGINS_REMOTE}/${name}"
     echo "Plugin: ${plugin_dir}  ->  ${remote}"
     CMDS+=("mkdir ${remote}")
+    file_i=0
     while IFS= read -r -d '' f; do
-      rel="${f#${plugin_dir}}"
+      file_i=$((file_i + 1))
+      if [[ "$file_i" -gt 5000 ]]; then
+        echo "Too many plugin files" >&2
+        exit 1
+      fi
+      if [[ "${#CMDS[@]}" -gt 10000 ]]; then
+        echo "Too many SFTP commands" >&2
+        exit 1
+      fi
+      rel="${f#"${plugin_dir}"}"
       [[ "$(basename "$f")" == ".gitkeep" ]] && continue
       if [[ "$(dirname "$rel")" != "." ]]; then
         CMDS+=("mkdir ${remote}/$(dirname "$rel")")
@@ -165,7 +206,13 @@ expect {
   timeout { puts stderr "TIMEOUT auth"; exit 1 }
 }
 set fp [open $batch r]
+set seen 0
 while {[gets $fp line] >= 0} {
+  incr seen
+  if {$seen > 10000} {
+    puts stderr "SFTP batch too long"
+    exit 1
+  }
   if {$line eq ""} { continue }
   send -- "$line\r"
   expect {

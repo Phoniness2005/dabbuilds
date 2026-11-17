@@ -42,3 +42,4 @@
 1. Read `README.md` and relevant files under `docs/`.
 2. Inspect existing `custom/` code before adding new files.
 3. Summarize the plan for non-trivial work; use plan mode for ambiguous redesigns.
+4. Follow `docs/standards/power-of-10.md` for theme, plugin, and script code.

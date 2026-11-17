@@ -32,13 +32,36 @@ $work[] = array(
 	<section class="dab-section">
 		<div class="dab-section__inner">
 			<div class="dab-cards dab-cards--2">
-				<?php foreach ( $work as $w ) : ?>
+				<?php
+				$dab_n = 0;
+				foreach ( $work as $w ) :
+					if ( $dab_n >= Dabbuilds_Child_Bounds::WORK ) {
+						break;
+					}
+					++$dab_n;
+					if ( ! isset( $w['num'], $w['kind'], $w['title'], $w['body'], $w['url'], $w['cta'], $w['tags'] ) ) {
+						continue;
+					}
+					if ( ! is_string( $w['num'] ) || ! is_string( $w['kind'] ) || ! is_string( $w['title'] ) || ! is_string( $w['body'] ) || ! is_string( $w['url'] ) || ! is_string( $w['cta'] ) || ! is_array( $w['tags'] ) ) {
+						continue;
+					}
+					?>
 					<article class="dab-card dab-work-card">
 						<p class="dab-work-card__meta"><span><?php echo esc_html( $w['num'] ); ?></span> <?php echo esc_html( $w['kind'] ); ?></p>
 						<h2 class="dab-card__title"><?php echo esc_html( $w['title'] ); ?></h2>
 						<p class="dab-card__body"><?php echo esc_html( $w['body'] ); ?></p>
 						<ul class="dab-tags">
-							<?php foreach ( $w['tags'] as $t ) : ?>
+							<?php
+							$dab_t = 0;
+							foreach ( $w['tags'] as $t ) :
+								if ( $dab_t >= Dabbuilds_Child_Bounds::TAGS ) {
+									break;
+								}
+								++$dab_t;
+								if ( ! is_string( $t ) ) {
+									continue;
+								}
+								?>
 								<li><?php echo esc_html( $t ); ?></li>
 							<?php endforeach; ?>
 						</ul>

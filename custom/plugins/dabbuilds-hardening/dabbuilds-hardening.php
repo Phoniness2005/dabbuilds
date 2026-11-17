@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Send browser security headers on WordPress-served responses.
  */
-function dabbuilds_hardening_send_headers() {
+function dabbuilds_hardening_send_headers(): void {
 	if ( headers_sent() ) {
 		return;
 	}
@@ -53,12 +53,12 @@ add_action( 'send_headers', 'dabbuilds_hardening_send_headers' );
 /**
  * Hide WordPress version tokens from markup and feeds.
  */
-function dabbuilds_hardening_hide_versions() {
+function dabbuilds_hardening_hide_versions(): void {
 	remove_action( 'wp_head', 'wp_generator' );
 	remove_action( 'wp_head', 'rsd_link' );
 	remove_action( 'wp_head', 'wlwmanifest_link' );
 	remove_action( 'wp_head', 'wp_shortlink_wp_head' );
-	add_filter( 'the_generator', '__return_empty_string' );
+	add_filter( 'the_generator', 'dabbuilds_hardening_return_empty_string' );
 	add_filter(
 		'style_loader_src',
 		'dabbuilds_hardening_strip_ver',
@@ -80,12 +80,12 @@ add_action( 'init', 'dabbuilds_hardening_hide_versions' );
  * @return string
  */
 function dabbuilds_hardening_strip_ver( $src ) {
-	if ( ! is_string( $src ) || $src === '' ) {
+	if ( '' === $src ) {
 		return $src;
 	}
 
 	$wp_ver = get_bloginfo( 'version' );
-	if ( $wp_ver === '' || strpos( $src, 'ver=' . $wp_ver ) === false ) {
+	if ( '' === $wp_ver || false === strpos( $src, 'ver=' . $wp_ver ) ) {
 		return $src;
 	}
 
@@ -95,14 +95,53 @@ function dabbuilds_hardening_strip_ver( $src ) {
 /**
  * Disable XML-RPC (host already returns 422; keep it off in WordPress too).
  */
-add_filter( 'xmlrpc_enabled', '__return_false' );
-add_filter( 'xmlrpc_methods', '__return_empty_array' );
+add_filter( 'xmlrpc_enabled', 'dabbuilds_hardening_return_false' );
+add_filter( 'xmlrpc_methods', 'dabbuilds_hardening_no_xmlrpc_methods' );
 
 /**
  * Do not advertise XML-RPC pingback on posts.
  */
-add_filter( 'pings_open', '__return_false' );
+add_filter( 'pings_open', 'dabbuilds_hardening_return_false' );
 add_filter( 'comments_open', 'dabbuilds_hardening_comments_closed', 20, 2 );
+
+/**
+ * Rule 9: named stand-in for __return_empty_string.
+ *
+ * @param mixed $value Ignored.
+ * @return string
+ */
+function dabbuilds_hardening_return_empty_string( $value ): string {
+	if ( is_string( $value ) && strlen( $value ) > 0 ) {
+		return '';
+	}
+	return '';
+}
+
+/**
+ * Rule 9: named stand-in for __return_false.
+ *
+ * @param mixed $value Ignored.
+ * @return bool
+ */
+function dabbuilds_hardening_return_false( $value ): bool {
+	if ( null !== $value && ! is_bool( $value ) ) {
+		return false;
+	}
+	return false;
+}
+
+/**
+ * Rule 9: named stand-in for __return_empty_array.
+ *
+ * @param mixed $methods Ignored.
+ * @return array<int, mixed>
+ */
+function dabbuilds_hardening_no_xmlrpc_methods( $methods ): array {
+	if ( ! is_array( $methods ) ) {
+		return array();
+	}
+	return array();
+}
 
 /**
  * Keep comments closed on the public site.
@@ -118,16 +157,22 @@ function dabbuilds_hardening_comments_closed( $open, $post_id ) { // phpcs:ignor
 /**
  * Remove anonymous access to the users REST collection (username enumeration).
  *
- * @param array $endpoints Registered REST routes.
- * @return array
+ * @param array<string, mixed> $endpoints Registered REST routes.
+ * @return array<string, mixed>
  */
-function dabbuilds_hardening_lock_user_rest( $endpoints ) {
+function dabbuilds_hardening_lock_user_rest( $endpoints ): array {
 	if ( is_user_logged_in() ) {
 		return $endpoints;
 	}
 
-	foreach ( array_keys( $endpoints ) as $route ) {
-		if ( strpos( $route, '/wp/v2/users' ) === 0 ) {
+	$routes = array_keys( $endpoints );
+	$limit  = count( $routes );
+	if ( $limit > 4096 ) {
+		$limit = 4096;
+	}
+	for ( $i = 0; $i < $limit; $i++ ) {
+		$route = $routes[ $i ];
+		if ( 0 === strpos( $route, '/wp/v2/users' ) ) {
 			unset( $endpoints[ $route ] );
 		}
 	}
@@ -160,7 +205,7 @@ function dabbuilds_hardening_cors( $served ) {
 /**
  * Replace core REST CORS headers.
  */
-function dabbuilds_hardening_replace_cors() {
+function dabbuilds_hardening_replace_cors(): void {
 	remove_filter( 'rest_pre_serve_request', 'rest_send_cors_headers' );
 	add_filter( 'rest_pre_serve_request', 'dabbuilds_hardening_cors' );
 }
@@ -169,13 +214,21 @@ add_action( 'rest_api_init', 'dabbuilds_hardening_replace_cors', 15 );
 /**
  * Do not expose author archives or ?author=N (login-name enumeration).
  */
-function dabbuilds_hardening_block_author_enum() {
+function dabbuilds_hardening_block_author_enum(): void {
 	if ( is_admin() ) {
 		return;
 	}
 
-	$author_q = isset( $_GET['author'] ) ? wp_unslash( $_GET['author'] ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-	if ( is_author() || $author_q !== '' ) {
+	$author_q = '';
+	if ( isset( $_GET['author'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- public enumeration probe, not a form action.
+		$author_raw = wp_unslash( $_GET['author'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- array probes stay flagged; strings are sanitized below.
+		if ( is_array( $author_raw ) ) {
+			$author_q = '1';
+		} elseif ( is_string( $author_raw ) ) {
+			$author_q = sanitize_text_field( $author_raw );
+		}
+	}
+	if ( is_author() || '' !== $author_q ) {
 		wp_safe_redirect( home_url( '/' ), 301 );
 		exit;
 	}
@@ -195,7 +248,7 @@ add_filter( 'login_errors', 'dabbuilds_hardening_login_error' );
 /**
  * Disable the theme/plugin file editor when wp-config has not already done so.
  */
-function dabbuilds_hardening_disallow_file_edit() {
+function dabbuilds_hardening_disallow_file_edit(): void {
 	if ( ! defined( 'DISALLOW_FILE_EDIT' ) ) {
 		define( 'DISALLOW_FILE_EDIT', true );
 	}

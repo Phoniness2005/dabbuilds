@@ -14,7 +14,7 @@ $c = dabbuilds_child_contact();
 	<div class="site-footer__inner">
 		<div class="site-footer__brand">
 			<p class="dab-wordmark__text">DAB Builds</p>
-			<p class="site-footer__line">Daniel Bryant &middot; <?php echo esc_html( $c['location'] ); ?></p>
+			<p class="site-footer__line">Daniel Bryant</p>
 		</div>
 		<ul class="site-footer__links">
 			<li><a href="mailto:<?php echo esc_attr( $c['email'] ); ?>"><?php echo esc_html( $c['email'] ); ?></a></li>

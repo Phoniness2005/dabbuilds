@@ -66,6 +66,10 @@ The child theme is a **Product Still on a dark void**: Instrument Serif nameplat
 Debug a specific hour: `https://dabbuilds.com/?dab-hour=12` (midday) or `?dab-hour=22` (evening).
 
 
+## Code standard
+
+Theme, plugin, and deploy-script changes follow NASA/JPL Power of 10 as adapted in [`docs/standards/power-of-10.md`](docs/standards/power-of-10.md).
+
 ## Status
 
 **Phase 1 — established:** repo, docs, folders for custom code.  

@@ -8,6 +8,7 @@
  * - SNHU B.A. is in progress, expected June 2027. Never imply it is complete.
  * - No pay figures. No on-call, travel, or overtime language.
  * - No contractions or em dashes in Daniel's copy.
+ * - No home city, and the public contact address is jobs@dabbuilds.com.
  *
  * @package dabbuilds-child
  */
@@ -17,26 +18,72 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Public contact points.
+ * Keep a job record only when the required fields are the expected types.
  *
- * @return array
+ * @param mixed $job Job record.
+ * @return array<string, mixed>
+ */
+function dabbuilds_child_freeze_job( $job ) {
+	if ( ! is_array( $job ) ) {
+		return array();
+	}
+	foreach ( array( 'org', 'role', 'dates', 'place', 'summary', 'bullets' ) as $key ) {
+		if ( ! isset( $job[ $key ] ) ) {
+			return array();
+		}
+	}
+	if ( ! is_string( $job['org'] ) || ! is_string( $job['role'] ) || ! is_string( $job['dates'] ) ) {
+		return array();
+	}
+	if ( ! is_string( $job['place'] ) || ! is_string( $job['summary'] ) || ! is_array( $job['bullets'] ) ) {
+		return array();
+	}
+	$bullets = array();
+	$count   = 0;
+	foreach ( $job['bullets'] as $bullet ) {
+		if ( $count >= Dabbuilds_Child_Bounds::BULLETS ) {
+			break;
+		}
+		++$count;
+		if ( ! is_string( $bullet ) ) {
+			return array();
+		}
+		$bullets[] = $bullet;
+	}
+	if ( count( $bullets ) < 1 ) {
+		return array();
+	}
+	return array(
+		'org'     => $job['org'],
+		'role'    => $job['role'],
+		'dates'   => $job['dates'],
+		'place'   => $job['place'],
+		'summary' => $job['summary'],
+		'bullets' => $bullets,
+	);
+}
+
+/**
+ * Public contact points. No home location is published.
+ *
+ * @return array{email: string, linkedin: string, github: string}
  */
 function dabbuilds_child_contact() {
-	return array(
-		'email'    => 'daniel@dabbuilds.com',
+	$contact = array(
+		'email'    => 'jobs@dabbuilds.com',
 		'linkedin' => 'https://www.linkedin.com/in/daniel-bryant-34749943b',
 		'github'   => 'https://github.com/Phoniness2005',
-		'location' => 'Pella, Iowa',
 	);
+	return $contact;
 }
 
 /**
  * The three "What I do" pillars. Only claims backed by Daniel's records.
  *
- * @return array
+ * @return list<array<string, mixed>>
  */
 function dabbuilds_child_pillars() {
-	return array(
+	$pillars = array(
 		array(
 			'num'   => 'I',
 			'title' => 'IT and Systems Support',
@@ -56,15 +103,16 @@ function dabbuilds_child_pillars() {
 			'tags'  => array( 'CNC', 'GD&T', 'NIMS', 'CAD', '3D printing' ),
 		),
 	);
+	return $pillars;
 }
 
 /**
- * Experience, newest first. Dates only, no pay.
+ * Emerson role.
  *
- * @return array
+ * @return array<string, mixed>
  */
-function dabbuilds_child_experience() {
-	return array(
+function dabbuilds_child_job_emerson() {
+	return dabbuilds_child_freeze_job(
 		array(
 			'org'     => 'Emerson (Fisher Valves)',
 			'role'    => 'Production Supervisor, Machining',
@@ -78,7 +126,17 @@ function dabbuilds_child_experience() {
 				'Work with production engineers on production and quality issues to reduce non-conformances, cost, and cycle time.',
 				'Support 5S+1, TPM, and Kaizen work, and keep production records for efficiency, cross-training, and quality.',
 			),
-		),
+		)
+	);
+}
+
+/**
+ * Wells Fargo role.
+ *
+ * @return array<string, mixed>
+ */
+function dabbuilds_child_job_wells_fargo() {
+	return dabbuilds_child_freeze_job(
 		array(
 			'org'     => 'Wells Fargo',
 			'role'    => 'Technology Operations Analyst 1',
@@ -91,12 +149,22 @@ function dabbuilds_child_experience() {
 				'Held Entra ID and Intune admin access for device and access work.',
 				'Followed security policy, took part in audits and access reviews, and kept work in line with regulatory standards.',
 			),
-		),
+		)
+	);
+}
+
+/**
+ * Pella Technology role. The employer name stays; the city does not.
+ *
+ * @return array<string, mixed>
+ */
+function dabbuilds_child_job_pella() {
+	return dabbuilds_child_freeze_job(
 		array(
 			'org'     => 'Pella Technology',
 			'role'    => 'IT Support Specialist',
 			'dates'   => 'May 2024 to Sep 2024',
-			'place'   => 'Pella, IA',
+			'place'   => '',
 			'summary' => 'Managed service provider support for commercial clients.',
 			'bullets' => array(
 				'Set up new computers for commercial clients through Microsoft Azure managed deployment.',
@@ -104,32 +172,62 @@ function dabbuilds_child_experience() {
 				'Moved client documentation from legacy systems into IT Glue.',
 				'Installed and supported VOIP phone systems and email security through Proofpoint.',
 			),
-		),
+		)
+	);
+}
+
+/**
+ * Vermeer IT role.
+ *
+ * @return array<string, mixed>
+ */
+function dabbuilds_child_job_vermeer_it() {
+	return dabbuilds_child_freeze_job(
 		array(
 			'org'     => 'Vermeer',
 			'role'    => 'IT Support Specialist I',
 			'dates'   => 'Feb 2022 to Apr 2024',
-			'place'   => 'Pella, IA',
-			'summary' => 'Service desk and in-person support across the Pella and Des Moines campuses.',
+			'place'   => '',
+			'summary' => 'Service desk and in-person support across the company campuses.',
 			'bullets' => array(
-				'Worked support requests through ITOP, phone, and Microsoft Teams, and supported users in person across the Pella and Des Moines campuses.',
+				'Worked support requests through ITOP, phone, and Microsoft Teams, and supported users in person across the company campuses.',
 				'Managed Okta access, Zoom, licenses, and device inventory, including onboarding and offboarding equipment.',
 				'Supported the SigmaNest 2023 install and license server update, and the MasterCam 2023 license renewal.',
 				'Built the 3DS license server with a RAID configuration that alerts IT Operations if a drive fails.',
 			),
-		),
+		)
+	);
+}
+
+/**
+ * Vermeer machining role.
+ *
+ * @return array<string, mixed>
+ */
+function dabbuilds_child_job_vermeer_shop() {
+	return dabbuilds_child_freeze_job(
 		array(
 			'org'     => 'Vermeer',
 			'role'    => 'Machining Specialist, then Plant 2 Plate Side Group Leader',
 			'dates'   => '2020 to 2022',
-			'place'   => 'Pella, IA',
+			'place'   => '',
 			'summary' => 'CNC lathes and mills, then led the plate side of the Plant 2 machine shop.',
 			'bullets' => array(
 				'Set up and edited programs on Mori Seiki CNC lathes and mills, machining heavy duty drilling rods and adapters from heat-treated steel.',
 				'Led daily operation of two lasers, two folders, two benders, laser programming, and the robotic weld cell.',
 				'Coordinated daily production with welding, assembly, and inventory group leaders across Plant 2.',
 			),
-		),
+		)
+	);
+}
+
+/**
+ * Army role.
+ *
+ * @return array<string, mixed>
+ */
+function dabbuilds_child_job_army() {
+	return dabbuilds_child_freeze_job(
 		array(
 			'org'     => 'U.S. Army',
 			'role'    => 'Allied Trades Specialist (91E Machinist)',
@@ -141,31 +239,59 @@ function dabbuilds_child_experience() {
 				'Accountable for the receipt, inventory, and readiness of general and specialty tool sets.',
 				'Selected as Standard Bearer for the Battalion Honor Guard.',
 			),
-		),
+		)
 	);
+}
+
+/**
+ * Experience, newest first. Dates only, no pay.
+ *
+ * @return list<array<string, mixed>>
+ */
+function dabbuilds_child_experience() {
+	$jobs  = array(
+		dabbuilds_child_job_emerson(),
+		dabbuilds_child_job_wells_fargo(),
+		dabbuilds_child_job_pella(),
+		dabbuilds_child_job_vermeer_it(),
+		dabbuilds_child_job_vermeer_shop(),
+		dabbuilds_child_job_army(),
+	);
+	$clean = array();
+	foreach ( $jobs as $job ) {
+		if ( ! isset( $job['org'] ) || ! is_string( $job['org'] ) || '' === $job['org'] ) {
+			continue;
+		}
+		if ( ! isset( $job['bullets'] ) || ! is_array( $job['bullets'] ) ) {
+			continue;
+		}
+		$clean[] = $job;
+	}
+	return $clean;
 }
 
 /**
  * Earlier roles, one line each.
  *
- * @return array
+ * @return list<string>
  */
 function dabbuilds_child_earlier_roles() {
-	return array(
+	$roles = array(
 		'Strength and Conditioning Coach, CrossFit SBC, Shreveport, LA (2019 to 2020)',
 		'Schedule II Production Technician, Dr. Reddy\'s Laboratories, Shreveport, LA (2017 to 2018)',
 		'Exercise Specialist, Christus Louisiana Athletic Clubs, Bossier City, LA (2015 to 2017)',
 		'Spacecraft Assembly Technician Intern, SpaceX, Hawthorne, CA (2014)',
 	);
+	return $roles;
 }
 
 /**
  * Education. SNHU is in progress.
  *
- * @return array
+ * @return list<array<string, mixed>>
  */
 function dabbuilds_child_education() {
-	return array(
+	$rows = array(
 		array(
 			'school' => 'Southern New Hampshire University',
 			'detail' => 'B.A., General Studies, Mathematics concentration',
@@ -177,15 +303,16 @@ function dabbuilds_child_education() {
 			'dates'  => '2014',
 		),
 	);
+	return $rows;
 }
 
 /**
  * Certifications and training (from the resume on file).
  *
- * @return array
+ * @return list<string>
  */
 function dabbuilds_child_certifications() {
-	return array(
+	$certs = array(
 		'CompTIA ITF+',
 		'Kaseya Certified Technician, Datto RMM',
 		'Dell PowerEdge Corrective Maintenance; Dell Client Foundations 2021; Dell Enterprise Self-Dispatch',
@@ -193,16 +320,18 @@ function dabbuilds_child_certifications() {
 		'Palantir Foundry and AIP Builder Foundations',
 		'NIMS Metalworking Skills Certification: Measurement, Materials, and Safety',
 	);
+	return $certs;
 }
 
 /**
  * Skills grouped for the resume. Only skills Daniel's records back.
  *
- * @return array
+ * @return array<string, list<string>>
  */
 function dabbuilds_child_skills() {
-	return array(
+	$skills = array(
 		'IT'     => array( 'User support', 'Windows', 'Microsoft 365', 'SCCM', 'Imaging', 'Citrix user support', 'Entra ID', 'Intune', 'Okta', 'SharePoint' ),
 		'Making' => array( 'CNC setup and program editing', 'GD&T', 'NIMS', 'CAD (hobby)', '3D printing' ),
 	);
+	return $skills;
 }

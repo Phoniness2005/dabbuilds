@@ -11,15 +11,18 @@ if [[ ! -f "${ENV_FILE}" ]]; then
   exit 1
 fi
 
-# shellcheck disable=SC1090
 set -a
+# shellcheck disable=SC1090
 source "${ENV_FILE}"
 set +a
 
-: "${SFTP_HOST:?SFTP_HOST required in .env.local}"
-: "${SFTP_PORT:?SFTP_PORT required in .env.local}"
-: "${SFTP_USER:?SFTP_USER required in .env.local}"
-: "${SFTP_PASSWORD:?SFTP_PASSWORD required in .env.local}"
-: "${SFTP_REMOTE_ROOT:=/html}"
+[[ -n "${SFTP_HOST:-}" ]] || { echo "SFTP_HOST required in .env.local" >&2; exit 1; }
+[[ -n "${SFTP_PORT:-}" ]] || { echo "SFTP_PORT required in .env.local" >&2; exit 1; }
+[[ -n "${SFTP_USER:-}" ]] || { echo "SFTP_USER required in .env.local" >&2; exit 1; }
+[[ -n "${SFTP_PASSWORD:-}" ]] || { echo "SFTP_PASSWORD required in .env.local" >&2; exit 1; }
+if [[ -z "${SFTP_REMOTE_ROOT:-}" ]]; then
+  SFTP_REMOTE_ROOT="/html"
+fi
+[[ -n "${SFTP_REMOTE_ROOT}" ]] || { echo "SFTP_REMOTE_ROOT required in .env.local" >&2; exit 1; }
 
 export ROOT ENV_FILE SFTP_HOST SFTP_PORT SFTP_USER SFTP_PASSWORD SFTP_REMOTE_ROOT

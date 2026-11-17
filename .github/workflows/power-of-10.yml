@@ -1,0 +1,50 @@
+name: Power of 10
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
+        with:
+          php-version: "8.3"
+          coverage: none
+          tools: composer
+
+      - name: Setup Node
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install analyzers
+        run: |
+          composer install --no-interaction --no-progress
+          npm ci
+          sudo apt-get update
+          sudo apt-get install -y shellcheck
+
+      - name: php -l
+        run: find custom/theme/dabbuilds-child custom/plugins -name '*.php' ! -path '*/play/*' -print0 | xargs -0 -n1 php -l
+
+      - name: PHPStan
+        run: vendor/bin/phpstan analyse --no-progress --memory-limit=1G
+
+      - name: PHPCS
+        run: vendor/bin/phpcs
+
+      - name: ESLint
+        run: npx eslint custom/theme/dabbuilds-child/assets/custom.js custom/theme/dabbuilds-child/assets/lighting.js
+
+      - name: ShellCheck
+        run: shellcheck -S style scripts/*.sh

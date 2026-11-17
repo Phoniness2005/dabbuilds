@@ -135,3 +135,15 @@ function dabbuilds_child_home_title_parts( $parts ) {
 	return $parts;
 }
 add_filter( 'document_title_parts', 'dabbuilds_child_home_title_parts' );
+
+/**
+ * /resume/ resolves to an old media attachment (resume.png from Aug 2026).
+ * Send it to the HTML résumé instead. Remove once the attachment slug is fixed in wp-admin.
+ */
+function dabbuilds_child_redirect_resume_attachment() {
+	if ( is_attachment() && 'resume' === get_post_field( 'post_name', get_queried_object_id() ) ) {
+		wp_safe_redirect( home_url( '/dabs-resume/' ), 301 );
+		exit;
+	}
+}
+add_action( 'template_redirect', 'dabbuilds_child_redirect_resume_attachment', 2 );

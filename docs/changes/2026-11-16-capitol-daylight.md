@@ -1,8 +1,8 @@
 # 2026-11-16 Capitol Daylight redesign (branch `redesign/capitol-daylight`)
 
-Status: **approved, not live.** Daniel approved the publish at 7:31 AM CT on Nov 17. Live dabbuilds.com is still dabbuilds-child v0.5.0. Deploy is blocked (box SFTP egress and WordPress login). See `docs/changes/2026-11-17-linkedin-and-deploy-status.md` for deploy status, the LinkedIn update, and remaining work.
+Status: **live** as of Nov 17, about 12:30 to 12:37 PM CT. dabbuilds.com is serving dabbuilds-child v0.6.0 (Capitol Daylight). See `docs/changes/2026-11-17-linkedin-and-deploy-status.md` for the deploy log, LinkedIn update, and remaining work.
 
-Do not merge this PR or mark it ready until the theme is live and verified.
+Do not merge PR #6 until Daniel decides to. The eight binary icon and OG files are still only in the box checkout and the theme zip, not on GitHub.
 
 Spec: Steve's change list "Capitol Daylight" (bright deco, Apple-smooth). Ivory/Paper/Marble grounds,
 Ink/Stone text, Deep Brass links, Brass buttons, Gilt decoration only. Josefin Sans 600/700 caps for display,

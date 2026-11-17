@@ -2,15 +2,15 @@
 
 **Owner:** Daniel Bryant / DAB Builds
 **Branch:** `redesign/capitol-daylight` (draft PR #6)
-**Status:** LinkedIn updates are live. The Capitol Daylight theme is approved but **not live**. dabbuilds.com is still serving dabbuilds-child v0.5.0.
+**Status:** **live.** Capitol Daylight (dabbuilds-child v0.6.0) was published to dabbuilds.com on Nov 17, about 12:30 to 12:37 PM CT. LinkedIn updates from earlier in the day are live, including the résumé in Featured.
 
 Companion to `docs/changes/2026-11-16-capitol-daylight.md`. Design source: Steve's change list "Capitol Daylight" at `/workspace/design-review/2026-11-16/steve-change-list.md`, the site audit at `/workspace/design-review/2026-11-16/site-audit.md`, and the commits on this branch.
 
 ---
 
-## Design (on this branch, not yet live)
+## Design (now live)
 
-Capitol Daylight is a bright deco, Apple-smooth redesign of the `dabbuilds-child` theme, now version 0.6.0 in `style.css`.
+Capitol Daylight is a bright deco, Apple-smooth redesign of the `dabbuilds-child` theme, version 0.6.0 in `style.css`.
 
 - Palette: Ivory `#F6F1E7`, Paper `#FFFDF8`, Marble `#EDE6D8`, Ink `#1C1A17`, Stone `#5E5A52`. Deep Brass `#8A5A12` for links, Brass `#7A4E0E` for buttons, Gilt `#C9A24A` for decoration only. Night: `#14120F` / `#EDE6D8` / `#D4AF5A`. Retired `#0A0A0B`, `#F5A524`, and `#C47A0A`.
 - Type: Josefin Sans 600/700 caps for display, nav, and buttons (14px minimum). Inter for body at 17-18px. Retired Instrument Serif and IBM Plex Sans.
@@ -29,34 +29,52 @@ Full file-level notes remain in `docs/changes/2026-11-16-capitol-daylight.md`.
 
 Daniel approved the publish at 7:31 AM CT on Nov 17: "Looks good, publish the site and update LinkedIn."
 
-The LinkedIn pass is done (below). Site publish is waiting on access. This PR stays a draft and should not be merged until the theme is live and verified.
+The LinkedIn pass and the theme publish are both done. This PR stays a draft. Do not merge it until Daniel decides to merge it to `main`.
 
 ---
 
-## Deploy status (not live)
+## Deploy log (live)
 
-- Live dabbuilds.com is still dabbuilds-child v0.5.0 (Product Still). Capitol Daylight v0.6.0 is on this branch only.
-- The v0.6.0 package and a rollback zip are on the ops box (not in git):
-  - `/workspace/design-review/2026-11-16/deploy-packages/dabbuilds-child-capitol-daylight-16b14c1.zip`
-  - `/workspace/design-review/2026-11-16/deploy-packages/dabbuilds-child-ROLLBACK-main-549b473.zip`
-- The usual path is `./scripts/deploy-sftp.sh --yes --theme-only`. That failed: the box network now allows only HTTP, so SSH/SFTP to `sftp.elementor.cloud:32022` returns `HTTP/1.1 400 Bad Request`.
-- A WordPress login attempt was rejected. There is no WordPress Application Password in the environment.
-- Waiting on Daniel for an egress change that allows SFTP, or a WordPress Application Password (or equivalent wp-admin access) so the v0.6.0 package can be installed and verified.
+**2026-11-17, about 12:30 to 12:37 PM CT**
+
+- Signed in to wp-admin through "Log in with Elementor". The old WordPress-only password does not work.
+- Uploaded `dabbuilds-child-capitol-daylight-16b14c1.zip` through Themes > Upload, using "Replace active with uploaded". The active theme went from 0.5.0 to 0.6.0.
+- Ran "Clear Hosting Cache" once; it succeeded.
+- Removed the old Customizer Site Icon and published. The theme favicons are now served.
+
+### Live checks
+
+- These pages return 200: `/`, `/about/`, `/contact/`, `/projects/`, `/build-log/`, `/dabs-resume/`.
+- `/resume/` returns 301 to `/dabs-resume/`.
+- The OG image `og-image-1200x630.png` returns 200.
+- `style.css?ver=0.6.0`.
+- The root `/favicon.ico` returns 404. That's minor, because the link tags point at the theme icons.
+
+### Packages and earlier SFTP attempt
+
+- The rollback zip is still at `/workspace/design-review/2026-11-16/deploy-packages/dabbuilds-child-ROLLBACK-main-549b473.zip`.
+- The earlier `./scripts/deploy-sftp.sh --yes --theme-only` path still fails: the box network now allows only HTTP, so SSH/SFTP to `sftp.elementor.cloud:32022` returns `HTTP/1.1 400 Bad Request`. Today's publish used the WordPress theme upload instead. Persistent access (SFTP egress or a WordPress Application Password) is still open.
 
 No credentials are recorded in this log.
+
+### Screenshots (box only, not committed)
+
+- `/workspace/design-review/2026-11-16/live/wp-themes-after.png`
+- `/workspace/design-review/2026-11-16/live/home-desktop.png`
+- `/workspace/design-review/2026-11-16/live/linkedin-featured-resume.png`
 
 ---
 
 ## Binary icon and OG files
 
-The eight files under `custom/theme/dabbuilds-child/assets/icons/` are **not on GitHub**. The GitHub connector pushes text only. The files exist in the box checkout (`/workspace/dabbuilds-repo`) and inside the v0.6.0 theme zip:
+The eight files under `custom/theme/dabbuilds-child/assets/icons/` are **not on GitHub**. The GitHub connector pushes text only. The files exist in the box checkout (`/workspace/dabbuilds-repo`) and inside the v0.6.0 theme zip (now installed on the live site):
 
 - `favicon-day-32.png`, `favicon-day-180.png`, `favicon-day-512.png`
 - `favicon-night-32.png`, `favicon-night-180.png`, `favicon-night-512.png`
 - `favicon.ico`
 - `og-image-1200x630.png`
 
-Sources: `/workspace/design-review/2026-11-16/assets/`. They must be added with git before this PR is merged, or they will be missing from the GitHub tree even if a zip-based live deploy includes them.
+Sources: `/workspace/design-review/2026-11-16/assets/`. They must be added with git before this PR is merged, or they will be missing from the GitHub tree even though the live theme has them.
 
 ---
 
@@ -91,32 +109,27 @@ Copy source: `/workspace/design-review/2026-11-16/linkedin-copy.md`.
 
   The intended remaining skills were Microsoft 365, Windows, Disk Imaging, Citrix (user support), Microsoft Entra ID, Microsoft Intune, Okta, Microsoft SharePoint, Jamf, Production Supervision, Training and Development, Computer-Aided Design (CAD), and 3D Printing. LinkedIn's standard labels replaced a few of the names we asked for (for example, CNC Machining became CNC Manufacturing).
 
-- Featured: dabbuilds.com, the Nano Long Range V1 update, and Wimbledon Pong.
+- Featured: dabbuilds.com, the Nano Long Range V1 update, Wimbledon Pong, and (after the theme went live) "DAB's Resume" at https://dabbuilds.com/dabs-resume/.
 
 ### Held on purpose
 
 - The custom URL (the current URL is on submitted applications).
 - The profile photo (must be a real photo of Daniel, never generated).
-- The résumé in Featured. Add it only after the new theme is live, because `/dabs-resume/` and `/resume/` still serve the old file or attachment on the current live site.
 
 ### Screenshots (box only, not committed)
 
-`/workspace/design-review/2026-11-16/live/linkedin-after-1.png` through `linkedin-after-4.png`.
+`/workspace/design-review/2026-11-16/live/linkedin-after-1.png` through `linkedin-after-4.png`, plus `/workspace/design-review/2026-11-16/live/linkedin-featured-resume.png`.
 
 ---
 
 ## Remaining work
 
-1. Publish Capitol Daylight (v0.6.0) once SFTP or a WordPress Application Password is available, then verify the live site (Day default 6 AM to 6 PM, Night palette, nav, home order, HTML résumé, favicons and OG).
-2. Purge cache (Cloudflare / Elementor / browser) after deploy.
-3. Clear the old Site Icon in the WordPress Customizer (the theme already stops printing it).
-4. Add the résumé to LinkedIn Featured after the site is live.
-5. wp-admin follow-ups from `site-audit.md` and the Nov 16 change log:
+1. wp-admin follow-ups from `site-audit.md` and the Nov 16 change log:
    - Upload a corrected résumé PDF and hook it via `dabbuilds_child_resume_download_url`.
    - Change the author slug `/author/ozvceopeps/` to `/author/daniel-bryant/`.
-   - Resolve the `/resume/` attachment slug collision (old `resume.png`). The theme on this branch redirects `/resume/` to `/dabs-resume/`.
    - Fix the Sep 10 lighting post copy (it still describes hourly light) and the Aug 29 post's "Resume 2026 V1" wording.
    - Add alt text on empty images in the Nano LR post.
    - Replace Work card screenshots with new-look shots.
-
-Do not merge PR #6 or mark it ready until publish and verification are done, and the eight binary assets are on GitHub.
+2. A mobile live check.
+3. Persistent access: SFTP egress (the box network still allows only HTTP) or a WordPress Application Password.
+4. Deciding whether to merge PR #6 to `main`. Do not merge it yet. The eight binary icon and OG files are still not on GitHub and should be added with git before a merge.

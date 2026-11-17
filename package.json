@@ -7,7 +7,7 @@
     "lint:js": "eslint custom/theme/dabbuilds-child/assets/custom.js custom/theme/dabbuilds-child/assets/lighting.js"
   },
   "devDependencies": {
-    "@eslint/js": "^9.15.0",
+    "@eslint/js": "^10.0.1",
     "eslint": "^9.15.0",
     "globals": "^15.12.0"
   }

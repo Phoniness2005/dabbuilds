@@ -23,3 +23,11 @@
     link.setAttribute('href', '/play/');
   });
 })();
+
+/* Résumé: print / save as PDF. */
+(function () {
+  'use strict';
+  document.querySelectorAll('[data-dab-print]').forEach(function (btn) {
+    btn.addEventListener('click', function () { window.print(); });
+  });
+})();

@@ -1,6 +1,6 @@
 <?php
 /**
- * Catalog index of the build log — clear serial / title / date rows.
+ * Home page (sectioned) and build log archives (tags, categories, author, search).
  *
  * @package dabbuilds-child
  */
@@ -11,78 +11,52 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 global $wp_query;
 $paged = max( 1, (int) get_query_var( 'paged' ) );
-$per   = max( 1, (int) $wp_query->get( 'posts_per_page' ) );
 ?>
 <main id="content" class="site-main">
+	<?php if ( dabbuilds_child_is_blog_index() && 1 === $paged ) : ?>
 
-	<?php
-	if ( function_exists( 'dabbuilds_child_render_hero' ) ) {
-		dabbuilds_child_render_hero();
-	}
-	?>
+		<?php dabbuilds_child_render_home(); ?>
 
-	<section class="dab-ledger page-content dab-catalog" aria-label="<?php echo esc_attr__( 'Build log', 'dabbuilds-child' ); ?>">
-		<h2 class="dab-ledger__heading"><?php echo esc_html__( 'Build log', 'dabbuilds-child' ); ?></h2>
-		<p class="dab-ledger__lede"><?php echo esc_html__( 'Newest first. Open any entry for the full write-up.', 'dabbuilds-child' ); ?></p>
-
-		<div class="dab-ledger__list" role="list">
-			<?php
-			while ( have_posts() ) {
-				the_post();
-				$post_link = get_permalink();
-				$index     = ( $paged - 1 ) * $per + (int) $wp_query->current_post + 1;
-				$num       = str_pad( (string) $index, 3, '0', STR_PAD_LEFT );
-				?>
-				<a
-					class="dab-ledger__row dab-catalog__item"
-					role="listitem"
-					href="<?php echo esc_url( $post_link ); ?>"
-				>
-					<span class="dab-ledger__serial dab-catalog__index"><?php echo esc_html( $num ); ?></span>
-					<span class="dab-ledger__title"><?php echo wp_kses_post( get_the_title() ); ?></span>
-					<time class="dab-ledger__date dab-catalog__date" datetime="<?php echo esc_attr( get_the_date( DATE_W3C ) ); ?>">
-						<?php echo esc_html( get_the_date( 'Y.m.d' ) ); ?>
-					</time>
-				</a>
-				<?php
-			}
-			?>
-		</div>
-	</section>
-
-	<?php
-	if ( function_exists( 'dabbuilds_child_render_hire_strip' ) ) {
-		dabbuilds_child_render_hire_strip();
-	}
-
-	if ( $wp_query->max_num_pages > 1 ) :
-		$prev_arrow = is_rtl() ? '&rarr;' : '&larr;';
-		$next_arrow = is_rtl() ? '&larr;' : '&rarr;';
+	<?php else : ?>
+		<?php
+		if ( is_tag() || is_category() ) {
+			$eyebrow = is_tag() ? __( 'Tag', 'dabbuilds-child' ) : __( 'Category', 'dabbuilds-child' );
+			$heading = single_term_title( '', false );
+		} elseif ( is_author() ) {
+			$eyebrow = __( 'Author', 'dabbuilds-child' );
+			$heading = get_the_author_meta( 'display_name', (int) get_query_var( 'author' ) );
+		} elseif ( is_search() ) {
+			$eyebrow = __( 'Search', 'dabbuilds-child' );
+			$heading = get_search_query();
+		} else {
+			$eyebrow = __( 'Build log', 'dabbuilds-child' );
+			/* translators: %d: page number */
+			$heading = sprintf( __( 'Page %d', 'dabbuilds-child' ), $paged );
+		}
 		?>
-		<nav class="pagination" aria-label="<?php echo esc_attr__( 'Posts', 'dabbuilds-child' ); ?>">
-			<div class="nav-previous">
-				<?php
-				previous_posts_link(
-					sprintf(
-						/* translators: %s: arrow */
-						esc_html__( '%s Previous', 'dabbuilds-child' ),
-						sprintf( '<span class="meta-nav">%s</span>', $prev_arrow )
-					)
-				);
-				?>
+		<section class="dab-page-head">
+			<div class="dab-section__inner">
+				<a class="dab-back" href="<?php echo esc_url( home_url( '/build-log/' ) ); ?>"><span aria-hidden="true">&larr;</span> <?php echo esc_html__( 'Build log', 'dabbuilds-child' ); ?></a>
+				<p class="dab-eyebrow"><?php echo esc_html( $eyebrow ); ?></p>
+				<h1 class="dab-page-title"><?php echo esc_html( $heading ); ?></h1>
+				<?php dabbuilds_child_divider(); ?>
 			</div>
-			<div class="nav-next">
-				<?php
-				next_posts_link(
-					sprintf(
-						/* translators: %s: arrow */
-						esc_html__( 'Next %s', 'dabbuilds-child' ),
-						sprintf( '<span class="meta-nav">%s</span>', $next_arrow )
-					)
-				);
-				?>
-			</div>
-		</nav>
-	<?php endif; ?>
+		</section>
+		<section class="dab-section dab-ledger dab-ledger--page" aria-label="<?php echo esc_attr__( 'Entries', 'dabbuilds-child' ); ?>">
+			<div class="dab-section__inner">
+				<?php if ( have_posts() ) : ?>
+					<?php dabbuilds_child_render_log_rows(); ?>
+				<?php else : ?>
+					<p><?php echo esc_html__( 'Nothing here yet.', 'dabbuilds-child' ); ?></p>
+				<?php endif; ?>
 
+				<?php if ( $wp_query->max_num_pages > 1 ) : ?>
+					<nav class="pagination" aria-label="<?php echo esc_attr__( 'Posts', 'dabbuilds-child' ); ?>">
+						<div class="nav-previous"><?php previous_posts_link( esc_html__( 'Newer', 'dabbuilds-child' ) ); ?></div>
+						<div class="nav-next"><?php next_posts_link( esc_html__( 'Older', 'dabbuilds-child' ) ); ?></div>
+					</nav>
+				<?php endif; ?>
+			</div>
+		</section>
+	<?php endif; ?>
 </main>

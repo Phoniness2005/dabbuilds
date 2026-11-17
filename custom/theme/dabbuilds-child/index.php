@@ -1,6 +1,6 @@
 <?php
 /**
- * Site entry point — DAB Builds child.
+ * Site entry point - DAB Builds child.
  *
  * @package dabbuilds-child
  */

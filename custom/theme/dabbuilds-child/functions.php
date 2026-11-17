@@ -1,7 +1,6 @@
 <?php
-// resume-pin 2026-09-22T14:22Z
 /**
- * DAB Builds child theme (Hello Elementor).
+ * DAB Builds child theme (Hello Elementor). "Capitol Daylight" design system.
  *
  * Source of truth: https://github.com/Phoniness2005/dabbuilds
  */
@@ -10,13 +9,28 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+require_once get_stylesheet_directory() . '/inc/profile.php';
+require_once get_stylesheet_directory() . '/inc/routes.php';
+require_once get_stylesheet_directory() . '/inc/head-meta.php';
+require_once get_stylesheet_directory() . '/inc/home-sections.php';
+
+/**
+ * Cache-bust string for theme CSS/JS (Cloudflare caches by ?ver=).
+ */
+function dabbuilds_child_asset_ver() {
+	return '20261116-capitol-daylight-1';
+}
+
 /**
  * Enqueue fonts, parent/child styles, and custom assets.
  */
 function dabbuilds_child_enqueue_assets() {
+	$ver = dabbuilds_child_asset_ver();
+
+	// Josefin Sans (deco display caps) + Inter (body).
 	wp_enqueue_style(
 		'dabbuilds-fonts',
-		'https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=Instrument+Serif:ital@0;1&display=swap',
+		'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Josefin+Sans:wght@600;700&display=swap',
 		array(),
 		null
 	);
@@ -35,15 +49,13 @@ function dabbuilds_child_enqueue_assets() {
 		wp_get_theme()->get( 'Version' )
 	);
 
-	// Cache-bust when SFTP mtime does not advance (Cloudflare caches ?ver=).
-	$dab_asset_ver = '20260922-home-clarity-1';
 	$custom_css = get_stylesheet_directory() . '/assets/custom.css';
 	if ( file_exists( $custom_css ) ) {
 		wp_enqueue_style(
 			'dabbuilds-custom',
 			get_stylesheet_directory_uri() . '/assets/custom.css',
 			array( 'dabbuilds-child' ),
-			$dab_asset_ver
+			$ver
 		);
 	}
 
@@ -53,7 +65,7 @@ function dabbuilds_child_enqueue_assets() {
 			'dabbuilds-custom',
 			get_stylesheet_directory_uri() . '/assets/custom.js',
 			array(),
-			$dab_asset_ver,
+			$ver,
 			true
 		);
 	}
@@ -64,15 +76,19 @@ function dabbuilds_child_enqueue_assets() {
 			'dabbuilds-lighting',
 			get_stylesheet_directory_uri() . '/assets/lighting.js',
 			array(),
-			$dab_asset_ver,
+			$ver,
 			false
 		);
 	}
 }
+add_action( 'wp_enqueue_scripts', 'dabbuilds_child_enqueue_assets', 20 );
 
 /**
- * Coarse day/night class before lighting.js applies the hourly palette.
- * Reads local hour and localStorage only — nothing is sent to the server.
+ * Set Day or Night before first paint.
+ *
+ * Auto = Day from 06:00 to 17:59 local time, Night otherwise. Day and Night
+ * buttons lock the choice. Reads the local clock and localStorage only;
+ * nothing is sent to the server. ?dab-hour=0..23 forces an hour for screenshots.
  */
 function dabbuilds_child_lighting_boot() {
 	?>
@@ -81,28 +97,24 @@ function dabbuilds_child_lighting_boot() {
 		try {
 			var mode = 'auto';
 			try { mode = localStorage.getItem('dab-light-mode') || 'auto'; } catch (e) {}
+			if (mode !== 'day' && mode !== 'night') mode = 'auto';
 			var hour = new Date().getHours();
 			try {
 				var q = new URLSearchParams(location.search).get('dab-hour');
-				if (q !== null && q !== '') hour = parseInt(q, 10);
+				if (q !== null && q !== '' && !isNaN(parseInt(q, 10))) hour = ((parseInt(q, 10) % 24) + 24) % 24;
 			} catch (e) {}
-			if (mode === 'day') hour = 12;
-			if (mode === 'night') hour = 22;
-			hour = ((hour % 24) + 24) % 24;
-			if (isNaN(hour)) hour = new Date().getHours();
-			var night = (hour < 6 || hour >= 19);
+			var period = mode === 'day' ? 'day' : mode === 'night' ? 'night' : ((hour >= 6 && hour < 18) ? 'day' : 'night');
 			var el = document.documentElement;
 			el.dataset.dabMode = mode;
 			el.dataset.dabHour = String(hour);
-			el.dataset.dabPeriod = night ? 'night' : 'day';
-			el.style.colorScheme = night ? 'dark' : 'light';
+			el.dataset.dabPeriod = period;
+			el.style.colorScheme = period === 'night' ? 'dark' : 'light';
 		} catch (e) {}
 	})();
 	</script>
 	<?php
 }
 add_action( 'wp_head', 'dabbuilds_child_lighting_boot', 0 );
-add_action( 'wp_enqueue_scripts', 'dabbuilds_child_enqueue_assets', 20 );
 
 /**
  * Preconnect to Google Fonts.
@@ -129,111 +141,31 @@ add_filter( 'wp_resource_hints', 'dabbuilds_child_resource_hints', 10, 2 );
  * Whether the current request is the main blog index (not a single post/page).
  */
 function dabbuilds_child_is_blog_index() {
-	return ( is_home() || is_front_page() ) && ! is_singular();
+	return ( is_home() || is_front_page() ) && ! is_singular() && ! dabbuilds_child_virtual_route();
 }
 
 /**
- * Public URL of the resume attachment (.doc / .pdf / .docx).
+ * Public URL of the resume attachment (.doc). Kept for the legacy download.
+ *
+ * NOTE: Resume-2026-V2.doc still has the old Vermeer dates and the old SNHU
+ * line. The HTML resume does not link to it until a corrected file is
+ * uploaded and this filter (or the pin below) is updated.
  *
  * @return string Empty if not found.
  */
 function dabbuilds_child_get_resume_file_url() {
-	// Hard-pin current resume so page-body links / transients cannot revive a CDN-cached V1.
 	return home_url( '/wp-content/uploads/2026/08/Resume-2026-V2.doc' );
 }
 
 /**
- * Home hero markup — Product Still (copy left + artifact stage + pillars).
- * Safe to call once per request.
+ * URL of a corrected resume download (PDF preferred). Empty = hide the link.
+ *
+ * Hook: add_filter( 'dabbuilds_child_resume_download_url', fn() => 'https://.../Resume.pdf' );
+ *
+ * @return string
  */
-function dabbuilds_child_render_hero() {
-	static $printed = false;
-	if ( $printed || ! dabbuilds_child_is_blog_index() ) {
-		return;
-	}
-	$printed = true;
-
-	// Media library still if present; else theme-bundled Nano LR photo.
-	$still_url = dabbuilds_child_shot_url( 'nano-long-range' );
-	if ( ! $still_url ) {
-		$still_url = dabbuilds_child_shot_url( 'nano-lr' );
-	}
-	if ( ! $still_url ) {
-		$still_url = dabbuilds_child_theme_still_url( 'nano-lr-still.jpg' );
-	}
-	$nano_url = home_url( '/nano-long-range-v1-update/' );
-	?>
-	<section class="dab-hero" aria-label="<?php echo esc_attr__( 'Introduction', 'dabbuilds-child' ); ?>">
-		<div class="dab-hero__inner">
-			<div class="dab-hero__copy">
-				<p class="dab-hero__eyebrow">Build · Iterate · Launch</p>
-				<h1 class="dab-hero__title">
-					What can I help you <span class="dab-hero__accent">build?</span>
-				</h1>
-				<p class="dab-hero__lede">
-					Hardware, software, and the space between — experiments, vehicles,
-					and code from someone who believes the future is still worth shipping.
-				</p>
-				<div class="dab-hero__actions">
-					<a class="dab-btn dab-btn--primary" href="#dab-latest"><?php echo esc_html__( 'Build log', 'dabbuilds-child' ); ?></a>
-					<a class="dab-btn dab-btn--ghost" href="<?php echo esc_url( home_url( '/projects/' ) ); ?>"><?php echo esc_html__( 'Projects', 'dabbuilds-child' ); ?></a>
-				</div>
-			</div>
-			<aside class="dab-hero__artifact" aria-label="<?php echo esc_attr__( 'Nano Long Range drone', 'dabbuilds-child' ); ?>">
-				<?php if ( $still_url ) : ?>
-					<a class="dab-hero__artifact-link" href="<?php echo esc_url( $nano_url ); ?>">
-						<img
-							class="dab-hero__artifact-img"
-							src="<?php echo esc_url( $still_url ); ?>"
-							alt="<?php echo esc_attr__( 'Nano Long Range V1 drone, fresh off the printer', 'dabbuilds-child' ); ?>"
-							loading="eager"
-							decoding="async"
-							width="768"
-							height="1024"
-						/>
-					</a>
-				<?php else : ?>
-					<div class="dab-hero__artifact-core" aria-hidden="true"></div>
-				<?php endif; ?>
-				<a class="dab-hero__artifact-meta" href="<?php echo esc_url( $nano_url ); ?>">Nano LR · build log</a>
-			</aside>
-		</div>
-		<p class="dab-focus">FPV &amp; flight systems · AI-assisted building · open experiments</p>
-	</section>
-	<div id="dab-latest" class="dab-latest-anchor"></div>
-	<?php
-}
-
-/**
- * Hire-ready strip on the blog index (after hero, before build log).
- * Safe to call once per request.
- */
-function dabbuilds_child_render_hire_strip() {
-	static $printed = false;
-	if ( $printed || ! dabbuilds_child_is_blog_index() ) {
-		return;
-	}
-	$printed = true;
-	?>
-	<section class="dab-hire dab-hire--compact" id="dab-hire" aria-label="<?php echo esc_attr__( 'Contact', 'dabbuilds-child' ); ?>">
-		<div class="dab-hire__inner">
-			<div class="dab-hire__copy">
-				<p class="dab-hire__kicker"><?php echo esc_html__( 'Available for hire', 'dabbuilds-child' ); ?></p>
-				<p>
-					<strong>Daniel Bryant</strong> — production / IT / ops, flight hardware, and shop software.
-				</p>
-				<p class="dab-hire__mail">
-					<a href="mailto:daniel@dabbuilds.com"><?php echo esc_html( 'daniel@dabbuilds.com' ); ?></a>
-					<span aria-hidden="true"> · </span>
-					<a href="mailto:jobs@dabbuilds.com"><?php echo esc_html( 'jobs@dabbuilds.com' ); ?></a>
-				</p>
-			</div>
-			<a class="dab-btn dab-btn--ghost" href="<?php echo esc_url( home_url( '/dabs-resume/' ) ); ?>">
-				<?php echo esc_html__( 'Resume', 'dabbuilds-child' ); ?>
-			</a>
-		</div>
-	</section>
-	<?php
+function dabbuilds_child_resume_download_url() {
+	return (string) apply_filters( 'dabbuilds_child_resume_download_url', '' );
 }
 
 /**
@@ -259,17 +191,20 @@ add_filter( 'hello_elementor_page_title', 'dabbuilds_child_hide_home_archive_tit
 function dabbuilds_child_force_templates( $template ) {
 	$dir = get_stylesheet_directory();
 
-	if ( is_page( 'dabs-resume' ) ) {
-		$custom = $dir . '/page-dabs-resume.php';
+	$route = dabbuilds_child_virtual_route();
+	if ( $route ) {
+		$custom = $dir . '/page-' . $route . '.php';
 		if ( file_exists( $custom ) ) {
 			return $custom;
 		}
 	}
 
-	if ( is_page( 'projects' ) ) {
-		$custom = $dir . '/page-projects.php';
-		if ( file_exists( $custom ) ) {
-			return $custom;
+	foreach ( array( 'dabs-resume', 'projects', 'about', 'contact', 'build-log' ) as $slug ) {
+		if ( is_page( $slug ) ) {
+			$custom = $dir . '/page-' . $slug . '.php';
+			if ( file_exists( $custom ) ) {
+				return $custom;
+			}
 		}
 	}
 
@@ -290,6 +225,15 @@ function dabbuilds_child_force_templates( $template ) {
 	return $template;
 }
 add_filter( 'template_include', 'dabbuilds_child_force_templates', 99 );
+
+/**
+ * Gilt stepped "ziggurat" divider (the one deco motif).
+ *
+ * @param string $extra Extra class.
+ */
+function dabbuilds_child_divider( $extra = '' ) {
+	echo '<div class="dab-divider ' . esc_attr( $extra ) . '" aria-hidden="true"><svg viewBox="0 0 120 14" width="120" height="14" focusable="false"><path d="M0 13h40v-4h8v-4h8V1h8v4h8v4h8v4h40" fill="none" stroke="currentColor" stroke-width="1.25"/></svg></div>';
+}
 
 /**
  * Theme-bundled still URL (ships with the child theme; no media-library dependency).
@@ -408,7 +352,7 @@ function dabbuilds_child_rewrite_game_url( $content ) {
 add_filter( 'the_content', 'dabbuilds_child_rewrite_game_url', 20 );
 
 /**
- * Extra Elementor hooks — print hero if archive location still runs.
+ * Extra Elementor hooks - print hero if archive location still runs.
  */
 function dabbuilds_child_elementor_archive_hero() {
 	dabbuilds_child_render_hero();
@@ -432,7 +376,7 @@ function dabbuilds_child_resume_download_headers() {
 	// Only force download for our known resume URL path.
 	$path = wp_parse_url( $file, PHP_URL_PATH );
 	$req  = wp_parse_url( home_url( add_query_arg( array() ) ), PHP_URL_PATH );
-	// Handled via dedicated endpoint below — this early check is unused for remote files.
+	// Handled via dedicated endpoint below - this early check is unused for remote files.
 	unset( $path, $req );
 }
 // Attachment files are static on CDN; download attr on <a> is enough for modern browsers.

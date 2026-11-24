@@ -71,7 +71,7 @@ function dabbuilds_child_freeze_job( $job ) {
 function dabbuilds_child_contact() {
 	$contact = array(
 		'email'    => 'jobs@dabbuilds.com',
-		'linkedin' => 'https://www.linkedin.com/in/daniel-bryant-34749943b',
+		'linkedin' => 'https://www.linkedin.com/in/daniel-a-bryant',
 		'github'   => 'https://github.com/Phoniness2005',
 	);
 	return $contact;

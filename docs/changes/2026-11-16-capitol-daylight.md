@@ -14,7 +14,7 @@ nav, and buttons (14px minimum); Inter body at 17-18px.
   `#0A0A0B`, `#F5A524`, `#C47A0A`, IBM Plex Sans, and Instrument Serif. One deco motif: the Gilt stepped divider.
 - `assets/lighting.js` simplified: Auto = Day 06:00-17:59 local, Night otherwise; Day/Night locks still work.
   `?dab-hour=` still forces an hour. Colors live in CSS; JS only flips `data-dab-period`.
-- Home order: Hero, What I do, Selected work, Experience, Build log (latest 3), Contact strip (`inc/home-sections.php`).
+- Home order: Hero, What I do, Selected work, Experience, Build log (latest 3), Contact strip (`inc/home-sections.php`). Later updated in theme 0.6.3: Credentials sits between Experience and Build log, and the Contact strip is banded so backgrounds keep alternating (see `docs/changes/2026-11-24-credly-credentials.md`).
 - Hero: deco caps headline, Brass "See my work" button, "Résumé" text link, framed image slot
   (placeholder monogram until a real photo lands; hook `dabbuilds_child_hero_image` or drop `assets/stills/hero.jpg`).
 - Nav: Home, Work, About, Résumé, Contact.

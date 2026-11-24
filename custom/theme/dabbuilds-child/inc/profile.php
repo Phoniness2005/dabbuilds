@@ -307,20 +307,277 @@ function dabbuilds_child_education() {
 }
 
 /**
- * Certifications and training (from the resume on file).
+ * Public Credly profile.
+ *
+ * @return string
+ */
+function dabbuilds_child_credly_url() {
+	return 'https://www.credly.com/users/daniel-bryant.6c63c37c';
+}
+
+/**
+ * Keep a credential record only when the required fields are valid.
+ *
+ * @param mixed $row Credential record.
+ * @return array<string, string>
+ */
+function dabbuilds_child_freeze_credential( $row ) {
+	if ( ! is_array( $row ) ) {
+		return array();
+	}
+	foreach ( array( 'name', 'issuer', 'year', 'image', 'url' ) as $key ) {
+		if ( ! isset( $row[ $key ] ) || ! is_string( $row[ $key ] ) || '' === $row[ $key ] ) {
+			return array();
+		}
+	}
+	if ( 1 !== preg_match( '/^[a-z0-9][a-z0-9.-]{0,120}\.png$/', $row['image'] ) ) {
+		return array();
+	}
+	if ( 1 !== preg_match( '/^https:\/\/www\.credly\.com\/badges\/[a-f0-9-]{36}$/', $row['url'] ) ) {
+		return array();
+	}
+	if ( 1 !== preg_match( '/^20[0-9]{2}$/', $row['year'] ) ) {
+		return array();
+	}
+	return array(
+		'name'   => $row['name'],
+		'issuer' => $row['issuer'],
+		'year'   => $row['year'],
+		'image'  => $row['image'],
+		'url'    => $row['url'],
+	);
+}
+
+/**
+ * Theme URI for a self-hosted badge PNG. Rejects anything but a plain filename.
+ *
+ * @param string $image Filename under assets/badges/.
+ * @return string
+ */
+function dabbuilds_child_credential_image_url( $image ) {
+	if ( 1 !== preg_match( '/^[a-z0-9][a-z0-9.-]{0,120}\.png$/', $image ) ) {
+		return '';
+	}
+	return get_stylesheet_directory_uri() . '/assets/badges/' . $image;
+}
+
+/**
+ * CompTIA, then the first IBM IT-track badges.
+ *
+ * @return list<array<string, string>>
+ */
+function dabbuilds_child_credential_rows_it() {
+	return array(
+		array(
+			'name'   => 'CompTIA IT Fundamentals+ (ITF+) Certification',
+			'issuer' => 'CompTIA',
+			'year'   => '2024',
+			'image'  => 'comptia-it-fundamentals-itf-certification-581bc9bc.png',
+			'url'    => 'https://www.credly.com/badges/581bc9bc-492a-42cf-9ba9-9ebcccc44cf6',
+		),
+		array(
+			'name'   => 'Introduction to Cloud Computing',
+			'issuer' => 'IBM',
+			'year'   => '2023',
+			'image'  => 'introduction-to-cloud-computing-76d108a7.png',
+			'url'    => 'https://www.credly.com/badges/76d108a7-c98e-42ab-b9e4-f0391cf87c24',
+		),
+		array(
+			'name'   => 'Technical Support Capstone',
+			'issuer' => 'IBM',
+			'year'   => '2023',
+			'image'  => 'technical-support-capstone-5d2fff93.png',
+			'url'    => 'https://www.credly.com/badges/5d2fff93-a824-4a29-9de0-f030bcb0c0f0',
+		),
+		array(
+			'name'   => 'Cybersecurity Essentials',
+			'issuer' => 'IBM',
+			'year'   => '2023',
+			'image'  => 'cybersecurity-essentials-78b556b4.png',
+			'url'    => 'https://www.credly.com/badges/78b556b4-1528-4d20-8ff3-aa5fe733d54f',
+		),
+	);
+}
+
+/**
+ * Remaining IBM IT and technical support badges, newest first.
+ *
+ * @return list<array<string, string>>
+ */
+function dabbuilds_child_credential_rows_it_more() {
+	return array(
+		array(
+			'name'   => 'Networking and Storage Essentials',
+			'issuer' => 'IBM',
+			'year'   => '2023',
+			'image'  => 'networking-and-storage-essentials-ee6d7413.png',
+			'url'    => 'https://www.credly.com/badges/ee6d7413-b897-46cc-92cf-488f435b179e',
+		),
+		array(
+			'name'   => 'Software, Programming, and Database Essentials',
+			'issuer' => 'IBM',
+			'year'   => '2023',
+			'image'  => 'software-programming-and-database-essentials-7d25888b.png',
+			'url'    => 'https://www.credly.com/badges/7d25888b-3131-4643-ab42-326a74133193',
+		),
+		array(
+			'name'   => 'Hardware and Operating System Essentials',
+			'issuer' => 'IBM',
+			'year'   => '2023',
+			'image'  => 'hardware-and-operating-system-essentials-2a75a334.png',
+			'url'    => 'https://www.credly.com/badges/2a75a334-7a4d-49ea-96c0-6b54381ba2ce',
+		),
+		array(
+			'name'   => 'Technical Support Basics',
+			'issuer' => 'IBM',
+			'year'   => '2023',
+			'image'  => 'technical-support-basics-c68aca82.png',
+			'url'    => 'https://www.credly.com/badges/c68aca82-a61d-45fc-a334-bbb3a5f61c04',
+		),
+	);
+}
+
+/**
+ * IBM cybersecurity course badges, newest first.
+ *
+ * @return list<array<string, string>>
+ */
+function dabbuilds_child_credential_rows_cyber() {
+	return array(
+		array(
+			'name'   => 'Cybersecurity Compliance Framework & System Administration',
+			'issuer' => 'IBM',
+			'year'   => '2023',
+			'image'  => 'cybersecurity-compliance-framework-system-administration-2b34a778.png',
+			'url'    => 'https://www.credly.com/badges/2b34a778-e0f3-470e-b5cb-4728d8b3d00e',
+		),
+		array(
+			'name'   => 'Cybersecurity Roles, Processes & Operating System Security',
+			'issuer' => 'IBM',
+			'year'   => '2022',
+			'image'  => 'cybersecurity-roles-processes-operating-system-security-34f7594c.png',
+			'url'    => 'https://www.credly.com/badges/34f7594c-99c0-4cf1-a8a2-7096e77daf51',
+		),
+		array(
+			'name'   => 'Introduction to Cybersecurity Tools & Cyber Attacks',
+			'issuer' => 'IBM',
+			'year'   => '2022',
+			'image'  => 'introduction-to-cybersecurity-tools-cyber-attacks-95c26118.png',
+			'url'    => 'https://www.credly.com/badges/95c26118-0bb0-4247-b0f0-a25caf38a023',
+		),
+	);
+}
+
+/**
+ * IBM data science course badges, newest first.
+ *
+ * @return list<array<string, string>>
+ */
+function dabbuilds_child_credential_rows_data() {
+	return array(
+		array(
+			'name'   => 'Data Visualization with Python',
+			'issuer' => 'IBM',
+			'year'   => '2022',
+			'image'  => 'data-visualization-with-python-af5a9454.png',
+			'url'    => 'https://www.credly.com/badges/af5a9454-5e08-402d-9370-27a798f6b11c',
+		),
+		array(
+			'name'   => 'Data Analysis with Python',
+			'issuer' => 'IBM',
+			'year'   => '2022',
+			'image'  => 'data-analysis-with-python-9f026389.png',
+			'url'    => 'https://www.credly.com/badges/9f026389-eaba-473e-954a-12283e7d71eb',
+		),
+		array(
+			'name'   => 'Data Science Methodology',
+			'issuer' => 'IBM',
+			'year'   => '2022',
+			'image'  => 'data-science-methodology-e2005cee.png',
+			'url'    => 'https://www.credly.com/badges/e2005cee-c0a6-4cb9-921e-742f0c7b0195',
+		),
+		array(
+			'name'   => 'Tools for Data Science',
+			'issuer' => 'IBM',
+			'year'   => '2022',
+			'image'  => 'tools-for-data-science-bd0511d8.png',
+			'url'    => 'https://www.credly.com/badges/bd0511d8-8d08-4e1c-b12e-b70fe2d1c36d',
+		),
+		array(
+			'name'   => 'Data Science Orientation',
+			'issuer' => 'IBM',
+			'year'   => '2022',
+			'image'  => 'data-science-orientation-e9b2b197.png',
+			'url'    => 'https://www.credly.com/badges/e9b2b197-ef86-483f-b2cb-a5fd1e3d1ac8',
+		),
+	);
+}
+
+/**
+ * Credly badges, in site order. CompTIA first, then IBM tracks.
+ *
+ * @return list<array<string, string>>
+ */
+function dabbuilds_child_credentials() {
+	$clean = array();
+	$n     = 0;
+	$rows  = array_merge(
+		dabbuilds_child_credential_rows_it(),
+		dabbuilds_child_credential_rows_it_more(),
+		dabbuilds_child_credential_rows_cyber(),
+		dabbuilds_child_credential_rows_data()
+	);
+	foreach ( $rows as $row ) {
+		if ( $n >= Dabbuilds_Child_Bounds::CREDENTIALS ) {
+			break;
+		}
+		++$n;
+		$frozen = dabbuilds_child_freeze_credential( $row );
+		if ( ! isset( $frozen['name'] ) ) {
+			continue;
+		}
+		$clean[] = $frozen;
+	}
+	return $clean;
+}
+
+/**
+ * Training that is not on the public Credly profile.
+ *
+ * @return list<string>
+ */
+function dabbuilds_child_other_certifications() {
+	return array(
+		'Kaseya Certified Technician, Datto RMM',
+		'Dell PowerEdge Corrective Maintenance; Dell Client Foundations 2021; Dell Enterprise Self-Dispatch',
+		'Palantir Foundry and AIP Builder Foundations',
+		'NIMS Metalworking Skills Certification: Measurement, Materials, and Safety',
+	);
+}
+
+/**
+ * Certifications for the résumé: Credly badges as "name, issuer, year", then other training.
  *
  * @return list<string>
  */
 function dabbuilds_child_certifications() {
-	$certs = array(
-		'CompTIA ITF+',
-		'Kaseya Certified Technician, Datto RMM',
-		'Dell PowerEdge Corrective Maintenance; Dell Client Foundations 2021; Dell Enterprise Self-Dispatch',
-		'IBM Technical Support Capstone, plus IBM coursework in cybersecurity, networking and storage, and operating systems',
-		'Palantir Foundry and AIP Builder Foundations',
-		'NIMS Metalworking Skills Certification: Measurement, Materials, and Safety',
-	);
-	return $certs;
+	$lines = array();
+	$n     = 0;
+	foreach ( dabbuilds_child_credentials() as $cred ) {
+		if ( $n >= Dabbuilds_Child_Bounds::CERTS ) {
+			break;
+		}
+		++$n;
+		$lines[] = $cred['name'] . ', ' . $cred['issuer'] . ', ' . $cred['year'];
+	}
+	foreach ( dabbuilds_child_other_certifications() as $other ) {
+		if ( $n >= Dabbuilds_Child_Bounds::CERTS ) {
+			break;
+		}
+		++$n;
+		$lines[] = $other;
+	}
+	return $lines;
 }
 
 /**

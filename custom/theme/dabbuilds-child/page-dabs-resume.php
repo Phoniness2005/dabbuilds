@@ -121,44 +121,43 @@ $download = dabbuilds_child_resume_download_url();
 					<?php endforeach; ?>
 				</section>
 
-				<section class="dab-resume__block dab-resume__two" aria-labelledby="dab-r-skills">
-					<div>
-						<h3 class="dab-resume__h" id="dab-r-skills">Skills</h3>
-						<?php
-						$dab_g = 0;
-						foreach ( dabbuilds_child_skills() as $group => $items ) :
-							if ( $dab_g >= Dabbuilds_Child_Bounds::SKILL_GROUPS ) {
+				<section class="dab-resume__block" aria-labelledby="dab-r-skills">
+					<h3 class="dab-resume__h" id="dab-r-skills">Skills</h3>
+					<?php
+					$dab_g = 0;
+					foreach ( dabbuilds_child_skills() as $group => $items ) :
+						if ( $dab_g >= Dabbuilds_Child_Bounds::SKILL_GROUPS ) {
+							break;
+						}
+						++$dab_g;
+						$clean = array();
+						$dab_s = 0;
+						foreach ( $items as $item ) {
+							if ( $dab_s >= Dabbuilds_Child_Bounds::SKILLS ) {
 								break;
 							}
-							++$dab_g;
-							$clean = array();
-							$dab_s = 0;
-							foreach ( $items as $item ) {
-								if ( $dab_s >= Dabbuilds_Child_Bounds::SKILLS ) {
-									break;
-								}
-								++$dab_s;
-								$clean[] = $item;
+							++$dab_s;
+							$clean[] = $item;
+						}
+						?>
+						<p><strong><?php echo esc_html( $group ); ?>:</strong> <?php echo esc_html( implode( ', ', $clean ) ); ?></p>
+					<?php endforeach; ?>
+				</section>
+
+				<section class="dab-resume__block" aria-labelledby="dab-r-certs">
+					<h3 class="dab-resume__h" id="dab-r-certs">Certifications</h3>
+					<ul>
+						<?php
+						$dab_c = 0;
+						foreach ( dabbuilds_child_certifications() as $cert ) :
+							if ( $dab_c >= Dabbuilds_Child_Bounds::CERTS ) {
+								break;
 							}
+							++$dab_c;
 							?>
-							<p><strong><?php echo esc_html( $group ); ?>:</strong> <?php echo esc_html( implode( ', ', $clean ) ); ?></p>
+							<li><?php echo esc_html( $cert ); ?></li>
 						<?php endforeach; ?>
-					</div>
-					<div>
-						<h3 class="dab-resume__h">Certifications and training</h3>
-						<ul>
-							<?php
-							$dab_c = 0;
-							foreach ( dabbuilds_child_certifications() as $cert ) :
-								if ( $dab_c >= Dabbuilds_Child_Bounds::CERTS ) {
-									break;
-								}
-								++$dab_c;
-								?>
-								<li><?php echo esc_html( $cert ); ?></li>
-							<?php endforeach; ?>
-						</ul>
-					</div>
+					</ul>
 				</section>
 			</article>
 		</div>

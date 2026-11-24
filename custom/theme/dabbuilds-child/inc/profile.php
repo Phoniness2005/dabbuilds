@@ -355,7 +355,7 @@ function dabbuilds_child_freeze_credential( $row ) {
  * @return string
  */
 function dabbuilds_child_credential_image_url( $image ) {
-	if ( ! is_string( $image ) || 1 !== preg_match( '/^[a-z0-9][a-z0-9.-]{0,120}\.png$/', $image ) ) {
+	if ( 1 !== preg_match( '/^[a-z0-9][a-z0-9.-]{0,120}\.png$/', $image ) ) {
 		return '';
 	}
 	return get_stylesheet_directory_uri() . '/assets/badges/' . $image;
@@ -575,9 +575,6 @@ function dabbuilds_child_certifications() {
 			break;
 		}
 		++$n;
-		if ( ! is_string( $other ) ) {
-			continue;
-		}
 		$lines[] = $other;
 	}
 	return $lines;

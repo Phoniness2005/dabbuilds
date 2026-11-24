@@ -154,9 +154,6 @@ $download = dabbuilds_child_resume_download_url();
 								break;
 							}
 							++$dab_c;
-							if ( ! is_string( $cert ) ) {
-								continue;
-							}
 							?>
 							<li><?php echo esc_html( $cert ); ?></li>
 						<?php endforeach; ?>

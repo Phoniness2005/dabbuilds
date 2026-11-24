@@ -426,12 +426,6 @@ function dabbuilds_child_render_credential_card( $badge ): void {
 	if ( ! isset( $badge['name'], $badge['issuer'], $badge['year'], $badge['url'], $badge['image'] ) ) {
 		return;
 	}
-	if ( ! is_string( $badge['name'] ) || ! is_string( $badge['issuer'] ) || ! is_string( $badge['year'] ) ) {
-		return;
-	}
-	if ( ! is_string( $badge['url'] ) || ! is_string( $badge['image'] ) ) {
-		return;
-	}
 	$src = dabbuilds_child_credential_image_url( $badge['image'] );
 	if ( '' === $src ) {
 		return;
@@ -455,9 +449,6 @@ function dabbuilds_child_render_credential_card( $badge ): void {
  * @param list<array<string, string>> $badges Frozen credentials.
  */
 function dabbuilds_child_render_credential_grid( $badges ): void {
-	if ( ! is_array( $badges ) ) {
-		return;
-	}
 	$class = 'dab-cred-grid';
 	if ( count( $badges ) <= 4 ) {
 		$class .= ' dab-cred-grid--few';
@@ -469,9 +460,6 @@ function dabbuilds_child_render_credential_grid( $badges ): void {
 			break;
 		}
 		++$n;
-		if ( ! is_array( $badge ) ) {
-			continue;
-		}
 		$item = 'dab-cred-grid__item';
 		if ( $n > Dabbuilds_Child_Bounds::CREDENTIALS_MOBILE ) {
 			$item .= ' dab-cred-grid__item--from-9';

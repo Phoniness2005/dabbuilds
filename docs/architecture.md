@@ -43,3 +43,18 @@ GitHub: Phoniness2005/dabbuilds
 ## Lighting (client-only)
 
 Hourly palettes live in the child theme (`assets/lighting.js`). The browser reads local time and `localStorage`; the server never sees the hour. See [`lighting.md`](./lighting.md).
+
+## Home page structure (current)
+
+The child theme (`dabbuilds-child` 0.6.3, Capitol Daylight) renders the home page in `inc/home-sections.php`. Order:
+
+1. Hero
+2. What I do
+3. Selected work
+4. Experience (plain background)
+5. Credentials (banded, `.dab-section--band`)
+6. Build log (plain; latest 3 posts)
+7. Contact strip (banded)
+
+Neighboring sections alternate plain and banded backgrounds so no two adjacent sections share the same ground. The résumé page (`page-dabs-resume.php`) includes a text-only Certifications list from the same data in `inc/profile.php`. Credly badge images are self-hosted under `assets/badges/`. Change log: [`changes/2026-11-24-credly-credentials.md`](./changes/2026-11-24-credly-credentials.md).
+

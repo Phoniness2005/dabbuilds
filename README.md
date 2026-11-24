@@ -25,6 +25,8 @@ This repo is the source of truth for:
 | CDN | Cloudflare |
 | GitHub | https://github.com/Phoniness2005/dabbuilds (public) |
 
+Home page order (theme 0.6.3): Hero, What I do, Selected work, Experience, Credentials, Build log, Contact. Backgrounds alternate so Experience and Build log stay plain, and Credentials and the Contact strip are banded. Details: [`docs/architecture.md`](docs/architecture.md), [`docs/changes/2026-11-24-credly-credentials.md`](docs/changes/2026-11-24-credly-credentials.md).
+
 ## Repo layout
 
 ```text

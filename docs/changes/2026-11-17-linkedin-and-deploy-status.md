@@ -15,7 +15,7 @@ Capitol Daylight is a bright deco, Apple-smooth redesign of the `dabbuilds-child
 - Palette: Ivory `#F6F1E7`, Paper `#FFFDF8`, Marble `#EDE6D8`, Ink `#1C1A17`, Stone `#5E5A52`. Deep Brass `#8A5A12` for links, Brass `#7A4E0E` for buttons, Gilt `#C9A24A` for decoration only. Night: `#14120F` / `#EDE6D8` / `#D4AF5A`. Retired `#0A0A0B`, `#F5A524`, and `#C47A0A`.
 - Type: Josefin Sans 600/700 caps for display, nav, and buttons (14px minimum). Inter for body at 17-18px. Retired Instrument Serif and IBM Plex Sans.
 - Lighting: Auto shows Day from 6 AM to 6 PM local (`06:00` to `17:59`); Night otherwise. Day/Night locks and `?dab-hour=` still work. Colors live in CSS; JS only flips `data-dab-period`.
-- Home order: Hero, What I do, Selected work, Experience, Build log (latest 3), Contact strip.
+- Home order: Hero, What I do, Selected work, Experience, Build log (latest 3), Contact strip. Later updated in theme 0.6.3: Credentials sits between Experience and Build log, and the Contact strip is banded so backgrounds keep alternating (see `docs/changes/2026-11-24-credly-credentials.md`).
 - Nav: Home, Work, About, Résumé, Contact. Theme-served `/about/`, `/contact/`, and `/build-log/` when no WordPress page exists. Contact has no form (email jobs@dabbuilds.com, LinkedIn, GitHub).
 - Native HTML résumé from `inc/profile.php` (Vermeer split, SNHU expected June 2027). Work cards replace the old cyan screenshot grid. Head tags add meta description, canonical, Open Graph, Twitter card, and theme favicons. The WordPress Site Icon is no longer printed.
 

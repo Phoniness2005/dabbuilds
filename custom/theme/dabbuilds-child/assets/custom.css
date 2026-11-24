@@ -100,7 +100,8 @@ body:not([class*="elementor-page-"]) .site-main,
 .dab-tags li,
 .dab-work-card__meta,
 .dab-timeline__dates,
-.dab-wordmark__text {
+.dab-wordmark__text,
+.dab-cred-more__toggle {
 	font-family: var(--dab-display);
 	font-weight: 600;
 	text-transform: uppercase;
@@ -397,11 +398,17 @@ body .site-main.dab-singular { padding: clamp(40px, 6vw, 80px) var(--dab-gutter)
 	display: grid;
 	grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
 	gap: 24px;
+	align-items: stretch;
 	list-style: none;
 	margin: 0;
 	padding: 0;
 }
-.dab-cred-grid__item { min-width: 0; }
+.dab-cred-grid__item { min-width: 0; display: flex; }
+.dab-cred-grid__item--from-11 { display: none; }
+.dab-credentials:has(.dab-cred-more[open]) .dab-cred-grid__item--from-9,
+.dab-credentials:has(.dab-cred-more[open]) .dab-cred-grid__item--from-11 {
+	display: flex;
+}
 @media (min-width: 561px) {
 	.dab-cred-grid--few {
 		display: flex;
@@ -459,14 +466,14 @@ body .site-main.dab-singular { padding: clamp(40px, 6vw, 80px) var(--dab-gutter)
 	margin: 0 0 6px;
 	display: -webkit-box;
 	-webkit-box-orient: vertical;
-	-webkit-line-clamp: 2;
+	-webkit-line-clamp: 3;
 	overflow: hidden;
 }
 .dab-cred-card__issuer {
 	font-size: 14px;
 	line-height: 1.3;
 	color: var(--dab-muted);
-	margin: 0 0 4px;
+	margin: auto 0 4px;
 }
 .dab-cred-card__year {
 	font-size: 13px;
@@ -478,16 +485,23 @@ body .site-main.dab-singular { padding: clamp(40px, 6vw, 80px) var(--dab-gutter)
 .dab-cred-more__toggle {
 	cursor: pointer;
 	color: var(--dab-link);
-	font-size: 15px;
-	margin: 0 0 24px;
+	font-size: 14px;
+	margin: 0;
 	list-style: none;
+	display: inline-flex;
+	align-items: center;
 }
 .dab-cred-more__toggle::-webkit-details-marker { display: none; }
 .dab-cred-more__toggle::marker { content: ""; }
 .dab-cred-more__toggle:hover { color: var(--dab-ink); }
+.dab-cred-more__fewer { display: none; }
+.dab-cred-more[open] .dab-cred-more__show { display: none; }
+.dab-cred-more[open] .dab-cred-more__fewer { display: inline; }
+.dab-credentials .dab-section__more { margin-top: 18px; }
 html[data-dab-period="night"] .dab-cred-card { background: var(--dab-panel); }
 html[data-dab-period="night"] .dab-cred-card__medallion img { filter: none; }
 @media (max-width: 560px) {
+	.dab-cred-grid__item--from-9 { display: none; }
 	.dab-cred-grid {
 		grid-template-columns: repeat(2, minmax(0, 1fr));
 		gap: 16px;

@@ -362,7 +362,7 @@ function dabbuilds_child_render_log_teaser(): void {
 		return;
 	}
 	?>
-	<section class="dab-section dab-section--band dab-ledger" aria-labelledby="dab-log-title">
+	<section class="dab-section dab-ledger" aria-labelledby="dab-log-title">
 		<div class="dab-section__inner">
 			<?php dabbuilds_child_section_head( 'Build log', 'Latest from the shop.', 'dab-log-title' ); ?>
 			<?php dabbuilds_child_render_log_rows( $q, 3 ); ?>
@@ -378,7 +378,7 @@ function dabbuilds_child_render_log_teaser(): void {
 function dabbuilds_child_render_contact_strip(): void {
 	$c = dabbuilds_child_contact();
 	?>
-	<section class="dab-section dab-contact-strip" aria-labelledby="dab-contact-title">
+	<section class="dab-section dab-section--band dab-contact-strip" aria-labelledby="dab-contact-title">
 		<div class="dab-section__inner dab-contact-strip__inner">
 			<div>
 				<p class="dab-eyebrow">Contact</p>
@@ -438,7 +438,7 @@ function dabbuilds_child_render_credential_card( $badge ): void {
 	}
 	$alt = $badge['name'] . ' badge';
 	?>
-	<a class="dab-cred-card" href="<?php echo esc_url( $badge['url'] ); ?>" target="_blank" rel="noopener">
+	<a class="dab-cred-card" href="<?php echo esc_url( $badge['url'] ); ?>" target="_blank" rel="noopener" title="<?php echo esc_attr( $badge['name'] ); ?>">
 		<span class="dab-cred-card__medallion">
 			<img src="<?php echo esc_url( $src ); ?>" alt="<?php echo esc_attr( $alt ); ?>" width="112" height="112" loading="lazy" />
 		</span>
@@ -472,7 +472,14 @@ function dabbuilds_child_render_credential_grid( $badges ): void {
 		if ( ! is_array( $badge ) ) {
 			continue;
 		}
-		echo '<li class="dab-cred-grid__item">';
+		$item = 'dab-cred-grid__item';
+		if ( $n > Dabbuilds_Child_Bounds::CREDENTIALS_MOBILE ) {
+			$item .= ' dab-cred-grid__item--from-9';
+		}
+		if ( $n > Dabbuilds_Child_Bounds::CREDENTIALS_HOME ) {
+			$item .= ' dab-cred-grid__item--from-11';
+		}
+		echo '<li class="' . esc_attr( $item ) . '">';
 		dabbuilds_child_render_credential_card( $badge );
 		echo '</li>';
 	}
@@ -480,7 +487,7 @@ function dabbuilds_child_render_credential_grid( $badges ): void {
 }
 
 /**
- * 5) Credentials. Opposite band from Experience (plain), so this section is banded.
+ * 5) Credentials. Banded, between plain Experience and plain Build log.
  */
 function dabbuilds_child_render_credentials(): void {
 	$all   = dabbuilds_child_credentials();
@@ -488,35 +495,22 @@ function dabbuilds_child_render_credentials(): void {
 	if ( $total < 1 ) {
 		return;
 	}
-	$lead = array();
-	$rest = array();
-	$n    = 0;
-	$home = Dabbuilds_Child_Bounds::CREDENTIALS_HOME;
-	foreach ( $all as $badge ) {
-		if ( $n >= Dabbuilds_Child_Bounds::CREDENTIALS ) {
-			break;
-		}
-		++$n;
-		if ( count( $lead ) < $home ) {
-			$lead[] = $badge;
-		} else {
-			$rest[] = $badge;
-		}
-	}
 	?>
 	<section class="dab-section dab-section--band dab-credentials" aria-labelledby="dab-cred-title">
 		<div class="dab-section__inner">
 			<?php dabbuilds_child_section_head( 'Verified on Credly', 'Credentials', 'dab-cred-title' ); ?>
-			<?php dabbuilds_child_render_credential_grid( $lead ); ?>
-			<?php if ( count( $rest ) > 0 ) : ?>
+			<?php dabbuilds_child_render_credential_grid( $all ); ?>
+			<?php if ( $total > Dabbuilds_Child_Bounds::CREDENTIALS_MOBILE ) : ?>
 				<details class="dab-cred-more">
 					<summary class="dab-cred-more__toggle">
-						<?php
-						/* translators: %d: total credential count. */
-						echo esc_html( sprintf( __( 'Show all %d', 'dabbuilds-child' ), $total ) );
-						?>
+						<span class="dab-cred-more__show">
+							<?php
+							/* translators: %d: total credential count. */
+							echo esc_html( sprintf( __( 'Show all %d', 'dabbuilds-child' ), $total ) );
+							?>
+						</span>
+						<span class="dab-cred-more__fewer"><?php echo esc_html__( 'Show fewer', 'dabbuilds-child' ); ?></span>
 					</summary>
-					<?php dabbuilds_child_render_credential_grid( $rest ); ?>
 				</details>
 			<?php endif; ?>
 			<p class="dab-section__more"><a class="dab-link-cta" href="<?php echo esc_url( dabbuilds_child_credly_url() ); ?>" target="_blank" rel="noopener"><?php echo esc_html__( 'View all on Credly', 'dabbuilds-child' ); ?> <span aria-hidden="true">&rarr;</span></a></p>

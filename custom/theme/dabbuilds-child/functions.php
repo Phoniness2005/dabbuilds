@@ -57,7 +57,7 @@ function dabbuilds_child_query_int( $key ): int {
  * Cache-bust string for theme CSS/JS (Cloudflare caches by ?ver=).
  */
 function dabbuilds_child_asset_ver(): string {
-	$ver = '20261124-credly-1';
+	$ver = '20261124-credly-2';
 	if ( 1 !== preg_match( '/^[a-z0-9.-]{1,64}$/', $ver ) ) {
 		return '0';
 	}

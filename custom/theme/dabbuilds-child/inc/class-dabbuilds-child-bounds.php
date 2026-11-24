@@ -25,7 +25,9 @@ final class Dabbuilds_Child_Bounds {
 	public const BULLETS      = 16;
 	public const EARLIER      = 16;
 	public const EDUCATION    = 8;
-	public const CERTS        = 16;
+	public const CERTS        = 32;
+	public const CREDENTIALS  = 16;
+	public const CREDENTIALS_HOME = 8;
 	public const SKILL_GROUPS = 8;
 	public const SKILLS       = 24;
 	public const ROUTES       = 8;

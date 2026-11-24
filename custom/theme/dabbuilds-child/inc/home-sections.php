@@ -1,7 +1,7 @@
 <?php
 /**
  * Home page sections, in order:
- * 1) Hero  2) What I do  3) Selected work  4) Experience  5) Build log (latest 3)  6) Contact strip
+ * 1) Hero  2) What I do  3) Selected work  4) Experience  5) Credentials  6) Build log (latest 3)  7) Contact strip
  *
  * @package dabbuilds-child
  */
@@ -347,7 +347,7 @@ function dabbuilds_child_render_log_rows( $query = null, $limit = 0 ): void {
 }
 
 /**
- * 5) Build log, latest 3.
+ * 6) Build log, latest 3.
  */
 function dabbuilds_child_render_log_teaser(): void {
 	$q = new WP_Query(
@@ -373,7 +373,7 @@ function dabbuilds_child_render_log_teaser(): void {
 }
 
 /**
- * 6) Contact strip (also used at the foot of inner pages).
+ * 7) Contact strip (also used at the foot of inner pages).
  */
 function dabbuilds_child_render_contact_strip(): void {
 	$c = dabbuilds_child_contact();
@@ -416,6 +416,115 @@ function dabbuilds_child_page_head( $eyebrow, $title, $lede = '' ): void {
 	<?php
 }
 
+
+/**
+ * One Credly badge card. The whole card is the public badge link.
+ *
+ * @param array<string, string> $badge Frozen credential.
+ */
+function dabbuilds_child_render_credential_card( $badge ): void {
+	if ( ! isset( $badge['name'], $badge['issuer'], $badge['year'], $badge['url'], $badge['image'] ) ) {
+		return;
+	}
+	if ( ! is_string( $badge['name'] ) || ! is_string( $badge['issuer'] ) || ! is_string( $badge['year'] ) ) {
+		return;
+	}
+	if ( ! is_string( $badge['url'] ) || ! is_string( $badge['image'] ) ) {
+		return;
+	}
+	$src = dabbuilds_child_credential_image_url( $badge['image'] );
+	if ( '' === $src ) {
+		return;
+	}
+	$alt = $badge['name'] . ' badge';
+	?>
+	<a class="dab-cred-card" href="<?php echo esc_url( $badge['url'] ); ?>" target="_blank" rel="noopener">
+		<span class="dab-cred-card__medallion">
+			<img src="<?php echo esc_url( $src ); ?>" alt="<?php echo esc_attr( $alt ); ?>" width="112" height="112" loading="lazy" />
+		</span>
+		<span class="dab-cred-card__name"><?php echo esc_html( $badge['name'] ); ?></span>
+		<span class="dab-cred-card__issuer"><?php echo esc_html( $badge['issuer'] ); ?></span>
+		<span class="dab-cred-card__year"><?php echo esc_html( $badge['year'] ); ?></span>
+	</a>
+	<?php
+}
+
+/**
+ * Grid of badge cards. Bounded by CREDENTIALS.
+ *
+ * @param list<array<string, string>> $badges Frozen credentials.
+ */
+function dabbuilds_child_render_credential_grid( $badges ): void {
+	if ( ! is_array( $badges ) ) {
+		return;
+	}
+	$class = 'dab-cred-grid';
+	if ( count( $badges ) <= 4 ) {
+		$class .= ' dab-cred-grid--few';
+	}
+	echo '<ul class="' . esc_attr( $class ) . '">';
+	$n = 0;
+	foreach ( $badges as $badge ) {
+		if ( $n >= Dabbuilds_Child_Bounds::CREDENTIALS ) {
+			break;
+		}
+		++$n;
+		if ( ! is_array( $badge ) ) {
+			continue;
+		}
+		echo '<li class="dab-cred-grid__item">';
+		dabbuilds_child_render_credential_card( $badge );
+		echo '</li>';
+	}
+	echo '</ul>';
+}
+
+/**
+ * 5) Credentials. Opposite band from Experience (plain), so this section is banded.
+ */
+function dabbuilds_child_render_credentials(): void {
+	$all   = dabbuilds_child_credentials();
+	$total = count( $all );
+	if ( $total < 1 ) {
+		return;
+	}
+	$lead = array();
+	$rest = array();
+	$n    = 0;
+	$home = Dabbuilds_Child_Bounds::CREDENTIALS_HOME;
+	foreach ( $all as $badge ) {
+		if ( $n >= Dabbuilds_Child_Bounds::CREDENTIALS ) {
+			break;
+		}
+		++$n;
+		if ( count( $lead ) < $home ) {
+			$lead[] = $badge;
+		} else {
+			$rest[] = $badge;
+		}
+	}
+	?>
+	<section class="dab-section dab-section--band dab-credentials" aria-labelledby="dab-cred-title">
+		<div class="dab-section__inner">
+			<?php dabbuilds_child_section_head( 'Verified on Credly', 'Credentials', 'dab-cred-title' ); ?>
+			<?php dabbuilds_child_render_credential_grid( $lead ); ?>
+			<?php if ( count( $rest ) > 0 ) : ?>
+				<details class="dab-cred-more">
+					<summary class="dab-cred-more__toggle">
+						<?php
+						/* translators: %d: total credential count. */
+						echo esc_html( sprintf( __( 'Show all %d', 'dabbuilds-child' ), $total ) );
+						?>
+					</summary>
+					<?php dabbuilds_child_render_credential_grid( $rest ); ?>
+				</details>
+			<?php endif; ?>
+			<p class="dab-section__more"><a class="dab-link-cta" href="<?php echo esc_url( dabbuilds_child_credly_url() ); ?>" target="_blank" rel="noopener"><?php echo esc_html__( 'View all on Credly', 'dabbuilds-child' ); ?> <span aria-hidden="true">&rarr;</span></a></p>
+		</div>
+	</section>
+	<?php
+}
+
 /**
  * Full home page body.
  */
@@ -424,6 +533,7 @@ function dabbuilds_child_render_home(): void {
 	dabbuilds_child_render_pillars();
 	dabbuilds_child_render_work();
 	dabbuilds_child_render_experience();
+	dabbuilds_child_render_credentials();
 	dabbuilds_child_render_log_teaser();
 	dabbuilds_child_render_contact_strip();
 }

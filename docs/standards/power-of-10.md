@@ -13,7 +13,7 @@ First-party code:
 Exempt, and left unchanged except where a rule is called out below:
 
 - `custom/theme/dabbuilds-child/play/` — the Wimbledon Pong pages and their images. Static game content, not the theme control plane.
-- Binary theme assets: `assets/icons/`, `assets/stills/`, and the play textures.
+- Binary theme assets: `assets/icons/`, `assets/stills/`, `assets/badges/`, and the play textures.
 - `assets/custom.css` is declarative. The rules about recursion, allocation, and assertions do not map onto stylesheet rules. The one CSS change in the Power of 10 pass is the mobile divider alignment.
 - `vendor/` and `node_modules/` are analyzer installs. They are gitignored and are not deployed.
 
